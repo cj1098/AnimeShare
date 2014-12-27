@@ -1,11 +1,16 @@
 package cj1098.animeshare;
 
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -23,8 +28,29 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        task task = new task();
-        task.execute();
+        //task task = new task();
+        //task.execute();
+        String[] elements = new String[10];
+        for (int i = 0; i< 10; i++) {
+            elements[i] = String.valueOf(i);
+        }
+
+        HomeScreenAdapter adapter = new HomeScreenAdapter(this,elements);
+
+        final ListView list = (ListView) findViewById(R.id.list3d);
+        list.setDivider(null);
+        list.setAdapter(adapter);
+        /**list.setOverscrollHeader();
+        list.setOverscrollFooter();*/
+        list.setSelector(new ColorDrawable(0x0));
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 1) {
+                    Toast.makeText(MainActivity.this, "CLICKED", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
 
