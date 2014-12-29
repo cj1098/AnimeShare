@@ -3,6 +3,12 @@ package cj1098.animeshare.userList;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import cj1098.animeshare.R;
@@ -102,6 +109,8 @@ public class UserListAdapter extends BaseAdapter {
             rb = (RatingBar)convertView.findViewById(R.id.anime_rating);
             rb.setRating(getItem(position).getCommunity_rating());
             title.setText(getItem(position).getTitle());
+            new DownloadImageTask((ImageView)convertView.findViewById(R.id.anime_image))
+                    .execute(getItem(position).getCover_image());
             //synopsis.setText(data.get(position).getSynopsis());
             convertView.setTag(new ViewHolder(title, synopsis, image, rb));
         }
@@ -115,8 +124,38 @@ public class UserListAdapter extends BaseAdapter {
 
         title.setText(getItem(position).getTitle());
         rb.setRating(getItem(position).getCommunity_rating());
+        new DownloadImageTask((ImageView)convertView.findViewById(R.id.anime_image))
+                .execute(getItem(position).getCover_image());
         //synopsis.setText(data.get(position).getSynopsis());
         return convertView;
+    }
+
+
+    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+
+        public DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            Drawable d = new BitmapDrawable(context.getResources(), result);
+            bmImage.setBackground(d);
+            notifyDataSetChanged();
+        }
     }
 
 }

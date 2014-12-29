@@ -121,9 +121,19 @@ public class MainActivity extends Activity {
 
             String line = in.readLine();
 
+            URI website2 = new URI("https://hummingbirdv1.p.mashape.com/anime/1");
+            request.setHeader("X-Mashape-Key", "rasJF18hhHmshDKpDzwpvlmZt5rAp1YrLFdjsn2XGCcBALFoQy");
+            request.setURI(website2);
+            HttpResponse response2 = httpclient.execute(request);
+            BufferedReader in2 = new BufferedReader(new InputStreamReader(
+                    response2.getEntity().getContent()));
+
+            String line2 = in2.readLine();
+
             ObjectMapper mapper = new ObjectMapper();
             mapper.setVisibilityChecker(mapper.getVisibilityChecker().withFieldVisibility(JsonAutoDetect.Visibility.ANY));
             userList.add(mapper.readValue(line, ListItem.class));
+            userList.add(mapper.readValue(line2, ListItem.class));
             Log.d("TEST", mapper.writeValueAsString(userList));
 
         }catch(Exception e){

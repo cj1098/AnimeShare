@@ -25,4 +25,5 @@ public class UserList extends Activity {
         UserListAdapter adapter = new UserListAdapter(this, data);
         mGridView.setAdapter(adapter);
     }
+
 }
