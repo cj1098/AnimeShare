@@ -3,6 +3,7 @@ package cj1098.animeshare.userList;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.drawable.BitmapDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,18 +11,32 @@ import android.widget.BaseAdapter;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
+
 import java.util.ArrayList;
 
+import cj1098.animeshare.MyApplication;
 import cj1098.animeshare.R;
 
 public class UserListAdapter extends BaseAdapter {
     ArrayList<ListItem> data;
     LayoutInflater mInflater;
     Context context;
+    MyApplication myApp;
+    ImageLoader imageLoader = ImageLoader.getInstance();
+    DisplayImageOptions options;
 
     public UserListAdapter(Context context, ArrayList<ListItem> data) {
         this.context = context;
         this.data = data;
+        this.myApp = myApp;
+        options = new DisplayImageOptions.Builder()
+                .cacheOnDisk(true).cacheInMemory(true)
+                .imageScaleType(ImageScaleType.EXACTLY)
+                .displayer(new FadeInBitmapDisplayer(300)).build();
     }
 
 
@@ -110,8 +125,10 @@ public class UserListAdapter extends BaseAdapter {
             rb = vh.getRb();
         }
 
-        image.setPlaceholderImage(R.drawable.ic_launcher);
-        image.setImageUrl(getItem(position).getCover_image());
+        image.setBackground(new BitmapDrawable(context.getResources(), imageLoader.loadImageSync(getItem(position).getCover_image(), options)));
+        //ImageLoader.getInstance().displayImage(getItem(position).getCover_image(), image, options);
+        //image.setPlaceholderImage(R.drawable.ic_launcher);
+        //image.setImageUrl(getItem(position).getCover_image());
         title.setText(getItem(position).getTitle());
         rb.setRating(getItem(position).getCommunity_rating());
 

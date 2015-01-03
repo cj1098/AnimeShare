@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.GridView;
-import android.widget.ProgressBar;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,17 +25,13 @@ import cj1098.animeshare.R;
 
 public class UserList extends Activity {
     private ArrayList<ListItem> userList = new ArrayList<>();
-    private ProgressBar pb;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.userlist_grid);
         task task = new task();
         task.execute();
-    }
-
-    private void initControls() {
-        ProgressBar pb = (ProgressBar)findViewById(R.id.api_load_progress);
     }
 
 
@@ -63,10 +58,11 @@ public class UserList extends Activity {
         @Override
         protected Void doInBackground(Void... params) {
             try{
+                HttpClient httpclient = new DefaultHttpClient();
+                HttpGet request = new HttpGet();
+                ObjectMapper mapper = new ObjectMapper();
                 for (int i = 1; i < 100; i++) {
-                    HttpClient httpclient = new DefaultHttpClient();
 
-                    HttpGet request = new HttpGet();
                     URI website = new URI("https://hummingbirdv1.p.mashape.com/anime/" + i);
                     request.setHeader("X-Mashape-Key", "rasJF18hhHmshDKpDzwpvlmZt5rAp1YrLFdjsn2XGCcBALFoQy");
                     request.setURI(website);
@@ -76,7 +72,6 @@ public class UserList extends Activity {
 
                     String line = in.readLine();
 
-                    ObjectMapper mapper = new ObjectMapper();
                     mapper.setVisibilityChecker(mapper.getVisibilityChecker().withFieldVisibility(JsonAutoDetect.Visibility.ANY));
                     userList.add(mapper.readValue(line, ListItem.class));
                     publishProgress(1);
