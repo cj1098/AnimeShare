@@ -125,6 +125,11 @@ public class UserListAdapter extends BaseAdapter {
             rb = vh.getRb();
         }
 
+        /*
+        This function .setBackGround is the goal. The problem is the imageLoader.loadImageSync. I believe that it only loads what's cached on the user's phone somehow?
+        .displayImage works and grabs from the url and displays but has problems with the dimensions of the image not being what I want. They don't fill the background.
+        So maybe I can fix that and use it instead.
+         */
         image.setBackground(new BitmapDrawable(context.getResources(), imageLoader.loadImageSync(getItem(position).getCover_image(), options)));
         //ImageLoader.getInstance().displayImage(getItem(position).getCover_image(), image, options);
         //image.setPlaceholderImage(R.drawable.ic_launcher);
