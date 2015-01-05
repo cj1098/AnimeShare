@@ -17,6 +17,10 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+/**
+ * pretty neat class that extends ImageView and has functions that download
+ * an image from a web url and sets the ImageView associated with it.
+ */
 public class WebImageView extends ImageView {
 
     private Drawable placeholder, image;

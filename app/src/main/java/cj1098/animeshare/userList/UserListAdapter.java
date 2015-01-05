@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
@@ -18,21 +19,23 @@ import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
 import java.util.ArrayList;
 
-import cj1098.animeshare.MyApplication;
 import cj1098.animeshare.R;
 
 public class UserListAdapter extends BaseAdapter {
     ArrayList<ListItem> data;
     LayoutInflater mInflater;
     Context context;
-    MyApplication myApp;
     ImageLoader imageLoader = ImageLoader.getInstance();
     DisplayImageOptions options;
 
+    /**
+     * constructor.
+     * @param context
+     * @param data
+     */
     public UserListAdapter(Context context, ArrayList<ListItem> data) {
         this.context = context;
         this.data = data;
-        this.myApp = myApp;
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true).cacheInMemory(true)
                 .imageScaleType(ImageScaleType.EXACTLY)
@@ -40,10 +43,14 @@ public class UserListAdapter extends BaseAdapter {
     }
 
 
+    /**
+     * static class to make getView()'s job a little easier. So it doesn't have to call
+     * findViewById everytime.
+     */
     private static class ViewHolder {
         TextView title;
         TextView synopsis;
-        WebImageView image;
+        ImageView image;
         RatingBar rb;
 
         public TextView getSynopsis() {
@@ -62,7 +69,7 @@ public class UserListAdapter extends BaseAdapter {
             this.rb = rb;
         }
 
-        private ViewHolder(TextView title, TextView synopsis, WebImageView image, RatingBar rb) {
+        private ViewHolder(TextView title, TextView synopsis, ImageView image, RatingBar rb) {
             this.title = title;
             this.synopsis = synopsis;
             this.image = image;
@@ -77,11 +84,11 @@ public class UserListAdapter extends BaseAdapter {
             this.title = title;
         }
 
-        public WebImageView getImage() {
+        public ImageView getImage() {
             return image;
         }
 
-        public void setImage(WebImageView image) {
+        public void setImage(ImageView image) {
             this.image = image;
         }
     }
@@ -105,7 +112,7 @@ public class UserListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         TextView title;
         TextView synopsis;
-        WebImageView image;
+        ImageView image;
         RatingBar rb;
         if (convertView == null) {
             mInflater = ((Activity)context).getLayoutInflater();

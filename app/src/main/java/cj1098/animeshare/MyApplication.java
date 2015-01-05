@@ -10,6 +10,9 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
+/**
+ * a global singleton class for maintaining data.
+ */
 public class MyApplication extends Application {
     @Override
     public void onCreate() {

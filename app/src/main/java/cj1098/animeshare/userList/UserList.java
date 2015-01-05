@@ -43,6 +43,9 @@ public class UserList extends Activity {
         initControls();
     }
 
+    /**
+     * setup the gridView and tell it to listen for scroll changes and act accordingly.
+     */
     private void initControls() {
         mGridView = (GridView)findViewById(R.id.user_gridlist);
         adapter = new UserListAdapter(this, userList);
@@ -66,6 +69,10 @@ public class UserList extends Activity {
 
     public class task extends AsyncTask<Void, Integer, Void> {
         ProgressDialog pd;
+
+        /**
+         * setup the progressbar
+         */
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -84,6 +91,12 @@ public class UserList extends Activity {
             pd.incrementProgressBy(values[0]);
         }
 
+        /**
+         * httpGet to hummingBird-v1 api to get JSON objects back and parse them using jackson. (Really cool) parcelable.com
+         * Also publishes the progress of the process to the user via a progressBar
+         * @param params
+         * @return
+         */
         @Override
         protected Void doInBackground(Void... params) {
             try{
@@ -112,6 +125,12 @@ public class UserList extends Activity {
             return null;
         }
 
+        /**
+         * This is for checking if the user has initially loaded the list or if they're in the process of loading more data for the list.
+         * if they're loading the list for the first time, then set the adapter. Otherwise, notify the adapter that the data set has changed
+         * and tell it to re-instantiate its views.
+         * @param aVoid
+         */
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);

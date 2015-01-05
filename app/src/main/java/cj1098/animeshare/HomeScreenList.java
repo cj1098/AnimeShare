@@ -14,6 +14,9 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ListView;
 
+/**
+ * this class is the main homepage. It creates a 3d listView effect.
+ */
 public class HomeScreenList extends ListView {
 
     /** used as a tool to measure max overscroll distance */
