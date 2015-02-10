@@ -119,7 +119,7 @@ public class UserListAdapter extends BaseAdapter {
             convertView = mInflater.inflate(R.layout.userlist_grid_singleview, parent, false);
             title = (TextView)convertView.findViewById(R.id.anime_title);
             synopsis = (TextView)convertView.findViewById(R.id.anime_description);
-            image = (WebImageView)convertView.findViewById(R.id.anime_image);
+            image = (ImageView)convertView.findViewById(R.id.anime_image);
             rb = (RatingBar)convertView.findViewById(R.id.anime_rating);
             //synopsis.setText(data.get(position).getSynopsis());
             convertView.setTag(new ViewHolder(title, synopsis, image, rb));
@@ -137,8 +137,8 @@ public class UserListAdapter extends BaseAdapter {
         .displayImage works and grabs from the url and displays but has problems with the dimensions of the image not being what I want. They don't fill the background.
         So maybe I can fix that and use it instead.
          */
-        image.setBackground(new BitmapDrawable(context.getResources(), imageLoader.loadImageSync(getItem(position).getCover_image(), options)));
-        //ImageLoader.getInstance().displayImage(getItem(position).getCover_image(), image, options);
+        //image.setBackground(new BitmapDrawable(context.getResources(), imageLoader.loadImageSync(getItem(position).getCover_image(), options)));
+        ImageLoader.getInstance().displayImage(getItem(position).getCover_image(), image, options);
         //image.setPlaceholderImage(R.drawable.ic_launcher);
         //image.setImageUrl(getItem(position).getCover_image());
         title.setText(getItem(position).getTitle());

@@ -2,12 +2,17 @@ package cj1098.animeshare.userList;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,10 +29,17 @@ import java.util.ArrayList;
 
 import cj1098.animeshare.R;
 
+/**
+ * Need to do an initial load I think... either that or I need to make
+ * a progress bar for when the user first goes into the list. Otherwise
+ * it's just a blank white screen.
+ */
+
 public class UserList extends Activity {
     private UserListAdapter adapter;
+    private ProgressBar animatedLoader;
     private GridView mGridView;
-    private ArrayList<ListItem> userList = new ArrayList<>();
+    private ArrayList<ListItem> userList = new ArrayList<ListItem>();
     private int currentVisibleItemCount;
     private int currentScrollState;
     private boolean isLoading = false;
@@ -48,6 +60,8 @@ public class UserList extends Activity {
      */
     private void initControls() {
         mGridView = (GridView)findViewById(R.id.user_gridlist);
+        animatedLoader = (ProgressBar)findViewById(R.id.gridview_loader);
+
         adapter = new UserListAdapter(this, userList);
         mGridView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -64,11 +78,21 @@ public class UserList extends Activity {
                 currentVisibleItemCount = visibleItemCount;
             }
         });
+
+        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(UserList.this);
+                builder.setTitle(userList.get(position).getTitle())
+                        .setMessage(userList.get(position).getSynopsis())
+                        .show();
+            }
+        });
     }
 
 
     public class task extends AsyncTask<Void, Integer, Void> {
-        ProgressDialog pd;
+        //ProgressDialog pd;
 
         /**
          * setup the progressbar
@@ -76,19 +100,19 @@ public class UserList extends Activity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pd = new ProgressDialog(UserList.this);
+            /*pd = new ProgressDialog(UserList.this);
             pd.setMessage("Bare with me. We're loading a bunch'a shit right now..");
             pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
             pd.setIndeterminate(false);
             pd.setMax(100);
-            pd.show();
+            pd.show();*/
         }
 
         //this just takes an integer to update by. Just set it by whatever you need.
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
-            pd.incrementProgressBy(values[0]);
+            //pd.incrementProgressBy(values[0]);
         }
 
         /**
@@ -134,10 +158,11 @@ public class UserList extends Activity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            pd.cancel();
+            //pd.cancel();
 
             if (isLoading) {
                 adapter.notifyDataSetChanged();
+                animatedLoader.setVisibility(View.GONE);
             }
             else {
                 mGridView.setAdapter(adapter);
@@ -158,6 +183,7 @@ public class UserList extends Activity {
                 endingId += 10;
                 task increment = new task();
                 increment.execute();
+                animatedLoader.setVisibility(View.VISIBLE);
             }
             else if (isLoading) {
                 isLoading = false;

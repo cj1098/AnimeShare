@@ -41,6 +41,7 @@ public class MainActivity extends Activity {
         list.setAdapter(adapter);
         /**list.setOverscrollHeader();
         list.setOverscrollFooter();*/
+
         list.setSelector(new ColorDrawable(0x0));
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
