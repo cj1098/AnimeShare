@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="drawer_items">
+        <item>main</item>
+        <item>share</item>
+        <item>music</item>
+        <item>conventions</item>
+        <item>feedback</item>
+        <item>support</item>
+    </string-array>
+</resources>

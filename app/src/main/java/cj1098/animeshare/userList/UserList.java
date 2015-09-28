@@ -16,15 +16,14 @@ import android.widget.RelativeLayout;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 
 import cj1098.animeshare.R;
@@ -93,6 +92,7 @@ public class UserList extends Activity {
 
     public class task extends AsyncTask<Void, Integer, Void> {
         //ProgressDialog pd;
+        JSONObject json;
 
         /**
          * setup the progressbar
@@ -124,19 +124,19 @@ public class UserList extends Activity {
         @Override
         protected Void doInBackground(Void... params) {
             try{
-                HttpClient httpclient = new DefaultHttpClient();
-                HttpGet request = new HttpGet();
                 ObjectMapper mapper = new ObjectMapper();
                 for (;startingId <= endingId; startingId++) {
+                    URL url = new URL("https://hummingbirdv1.p.mashape.com/anime/" + startingId);
+                    HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+                    conn.setRequestMethod("GET");
+                    conn.setRequestProperty("X-Mashape-Key", "rasJF18hhHmshDKpDzwpvlmZt5rAp1YrLFdjsn2XGCcBALFoQy");
+                    conn.setReadTimeout(15 * 1000);
+                    InputStream is = conn.getInputStream();
+                    InputStreamReader isw = new InputStreamReader(is);
+                    BufferedReader bf = new BufferedReader(isw);
+                    StringBuilder stringBuilder = new StringBuilder();
 
-                    URI website = new URI("https://hummingbirdv1.p.mashape.com/anime/" + startingId);
-                    request.setHeader("X-Mashape-Key", "rasJF18hhHmshDKpDzwpvlmZt5rAp1YrLFdjsn2XGCcBALFoQy");
-                    request.setURI(website);
-                    HttpResponse response = httpclient.execute(request);
-                    BufferedReader in = new BufferedReader(new InputStreamReader(
-                            response.getEntity().getContent()));
-
-                    String line = in.readLine();
+                    String line = bf.readLine();
 
                     mapper.setVisibilityChecker(mapper.getVisibilityChecker().withFieldVisibility(JsonAutoDetect.Visibility.ANY));
                     userList.add(mapper.readValue(line, ListItem.class));

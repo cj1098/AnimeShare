@@ -12,6 +12,7 @@ import java.util.ArrayList;
 public class ListItem implements Parcelable {
 
     private int id;
+    private int mal_id;
     private String slug;
     private String status;
     private String url;
@@ -31,9 +32,10 @@ public class ListItem implements Parcelable {
     public ListItem() {
     }
 
-    public ListItem(int id, String slug, String status, String url, String title, String alternate_title, int episode_count, int episode_length, String cover_image, String synopsis,
+    public ListItem(int id, int mal_id, String slug, String status, String url, String title, String alternate_title, int episode_count, int episode_length, String cover_image, String synopsis,
                     String show_type, String started_airing, String finished_airing, float community_rating, String age_rating, ArrayList<Name> genres) {
         this.id = id;
+        this.mal_id = mal_id;
         this.slug = slug;
         this.status = status;
         this.url = url;
@@ -53,6 +55,7 @@ public class ListItem implements Parcelable {
 
     protected ListItem(Parcel in) {
         id = in.readInt();
+        mal_id = in.readInt();
         slug = in.readString();
         status = in.readString();
         url = in.readString();
@@ -73,6 +76,14 @@ public class ListItem implements Parcelable {
         } else {
             genres = null;
         }
+    }
+
+    public int getMal_id() {
+        return mal_id;
+    }
+
+    public void setMal_id(int mal_id) {
+        this.mal_id = mal_id;
     }
 
     public String getTitle() {

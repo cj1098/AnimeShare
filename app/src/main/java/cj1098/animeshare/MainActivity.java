@@ -3,69 +3,51 @@ package cj1098.animeshare;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import cj1098.animeshare.userList.UserList;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
     public static HashMap<String, Drawable> cachedImages;
+    private Toolbar mToolbar;
+    private RecyclerView mRecyclerView;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private DrawerRecyclerAdapter mAdapter;
+    private DrawerLayout mDrawerLayout;
+    private ActionBarDrawerToggle mDrawerToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ActionBar ab = getActionBar();
-        ab.setLogo(R.drawable.logo);
+        setUpToolbar();
+        setUpNavDrawer();
+        //setupRecyclerView();
 
-        String[] elements = new String[10];
-        for (int i = 0; i< 10; i++) {
-            elements[i] = String.valueOf(i);
-        }
-
-        HomeScreenAdapter adapter = new HomeScreenAdapter(this,elements);
-
-
-        final ListView list = (ListView) findViewById(R.id.list3d);
-        list.setDivider(null);
-        list.setAdapter(adapter);
-        /**list.setOverscrollHeader();
-        list.setOverscrollFooter();*/
-
-        list.setSelector(new ColorDrawable(0x0));
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                switch (position) {
-                    case 0:
-                        //launch the user into their "list" so they can add/edit it.
-                        Intent userList = new Intent(MainActivity.this, UserList.class);
-                        startActivity(userList);
-
-                        break;
-                    case 1:
-                        break;
-                    case 2:
-                        break;
-                    case 3:
-                        break;
-                    case 4:
-                        break;
-                }
-            }
-        });
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -81,6 +63,10 @@ public class MainActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
@@ -89,4 +75,51 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+
+    public void setUpToolbar() {
+        mToolbar = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        //getSupportActionBar().setLogo(R.drawable.logo);
+    }
+
+    public void setUpRecyclerView() {
+        //mRecyclerView = (RecyclerView)findViewById(R.id.main_list);
+        mLayoutManager = new LinearLayoutManager(this);
+        mAdapter = new DrawerRecyclerAdapter(this, new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.drawer_items))));
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+    }
+
+    private void setUpNavDrawer() {
+        if (mToolbar != null) {
+            mDrawerToggle = new ActionBarDrawerToggle(
+                    this,                  /* host Activity */
+                    mDrawerLayout,         /* DrawerLayout object */
+                    mToolbar,  /* nav drawer icon to replace 'Up' caret */
+                    R.string.drawer_open,  /* "open drawer" description */
+                    R.string.drawer_close  /* "close drawer" description */
+            ) {
+                @Override
+                public void onDrawerOpened(View drawerView) {
+                    super.onDrawerOpened(drawerView);
+                }
+
+                @Override
+                public void onDrawerClosed(View drawerView) {
+                    super.onDrawerClosed(drawerView);
+                }
+            };
+            mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+            mDrawerLayout.setDrawerListener(mDrawerToggle);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu);
+            mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mDrawerLayout.openDrawer(GravityCompat.START);
+                }
+            });
+        }
+    }
 }

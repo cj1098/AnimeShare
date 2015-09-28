@@ -3,10 +3,9 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/MediumBlue</item>
-        <item name="colorPrimaryDark">@color/DarkBlue</item>
+        <item name="android:colorPrimary">@color/MediumBlue</item>
+        <item name="android:colorPrimaryDark">@color/DarkBlue</item>
     </style>
-
 
     <style name="drawer_text" parent="@android:style/TextAppearance.Medium">
         <item name="android:layout_width">fill_parent</item>
@@ -16,8 +15,8 @@
     </style>
 
     <style name="toolbar">
-        <item name="android:background">?attr/colorPrimary</item>
-        <item name="android:layout_height">?attr/actionBarSize</item>
+        <item name="android:background">?android:attr/colorPrimary</item>
+        <item name="android:layout_height">?android:attr/actionBarSize</item>
         <item name="android:layout_width">match_parent</item>
     </style>
 
