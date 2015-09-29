@@ -6,8 +6,11 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -21,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,19 +33,27 @@ import java.util.HashMap;
 import cj1098.animeshare.userList.UserList;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
+    ,ShowsFragment.OnFragmentInteractionListener{
     public static HashMap<String, Drawable> cachedImages;
     private Toolbar mToolbar;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
     private DrawerRecyclerAdapter mAdapter;
     private DrawerLayout mDrawerLayout;
+    private NavigationView mNavView;
     private ActionBarDrawerToggle mDrawerToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (getSupportFragmentManager().findFragmentById(R.id.base_content) == null) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.add(R.id.base_content, ShowsFragment.newInstance("A", "B"));
+            ft.commit();
+        }
 
         setUpToolbar();
         setUpNavDrawer();
@@ -76,13 +88,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void setUpToolbar() {
+    private void setUpToolbar() {
         mToolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         //getSupportActionBar().setLogo(R.drawable.logo);
     }
 
-    public void setUpRecyclerView() {
+    private void setUpRecyclerView() {
         //mRecyclerView = (RecyclerView)findViewById(R.id.main_list);
         mLayoutManager = new LinearLayoutManager(this);
         mAdapter = new DrawerRecyclerAdapter(this, new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.drawer_items))));
@@ -111,9 +123,11 @@ public class MainActivity extends AppCompatActivity {
                 }
             };
             mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+            mNavView = (NavigationView)findViewById(R.id.main_nav);
+            mNavView.setNavigationItemSelectedListener(this);
             mDrawerLayout.setDrawerListener(mDrawerToggle);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer);
             mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -121,5 +135,41 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem menuItem) {
+        if (menuItem.getItemId() == R.id.navigation_item_1) {
+            Snackbar.make(mToolbar, "1", Snackbar.LENGTH_SHORT).show();
+            if (getSupportFragmentManager().findFragmentById(R.id.base_content) != null) {
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.base_content, ShowsFragment.newInstance("A", "B"));
+                ft.commit();
+            }
+        }
+        else if(menuItem.getItemId() == R.id.navigation_item_2) {
+            Snackbar.make(mToolbar, "2", Snackbar.LENGTH_SHORT).show();
+        }
+        else if (menuItem.getItemId() == R.id.navigation_item_3) {
+
+        }
+        else if (menuItem.getItemId() == R.id.navigation_item_4) {
+
+        }
+        else if (menuItem.getItemId() == R.id.navigation_item_5) {
+
+        }
+        else {
+
+        }
+        menuItem.setChecked(true);
+        mDrawerLayout.closeDrawers();
+
+        return false;
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }

@@ -4,11 +4,28 @@
         <item
             android:id="@+id/navigation_item_1"
             android:checked="true"
-            android:icon="@drawable/abc_ic_clear_mtrl_alpha"
-            android:title="Item One" />
+            android:title="@string/drawer_menu_one" />
+
         <item
             android:id="@+id/navigation_item_2"
-            android:title="Item Two" />
+            android:title="@string/drawer_menu_two" />
+
+        <item
+            android:id="@+id/navigation_item_3"
+            android:title="@string/drawer_menu_three"></item>
+
+        <item
+            android:id="@+id/navigation_item_4"
+            android:title="@string/drawer_menu_four"></item>
+
+        <item
+            android:id="@+id/navigation_item_5"
+            android:title="@string/drawer_menu_five"></item>
+
+        <item
+            android:id="@+id/navigation_item_6"
+            android:title="@string/drawer_menu_six"></item>
+
     </group>
 
 
