@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
     android:orientation="vertical">
 
@@ -7,10 +7,18 @@
         android:id="@+id/anime_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
+    <ProgressBar
+        android:id="@+id/image_loader"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:indeterminate="true"
+        android:layout_gravity="center_horizontal"
+        />
     <TextView
         android:id="@+id/anime_title"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_below="@id/anime_image"/>
     <TextView
         android:id="@+id/anime_description"
         android:layout_width="wrap_content"
@@ -20,5 +28,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:numStars="5"
-        style="?android:attr/ratingBarStyleSmall"/>
-</LinearLayout>
+        style="?android:attr/ratingBarStyleSmall"
+        android:layout_above="@id/anime_image"/>
+
+
+</RelativeLayout>

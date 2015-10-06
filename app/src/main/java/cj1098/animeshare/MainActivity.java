@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if (getSupportFragmentManager().findFragmentById(R.id.base_content) == null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(R.id.base_content, ShowsFragment.newInstance("A", "B"));
+            ft.add(R.id.base_content, ShowsFragment.newInstance());
             ft.commit();
         }
 
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Snackbar.make(mToolbar, "1", Snackbar.LENGTH_SHORT).show();
             if (getSupportFragmentManager().findFragmentById(R.id.base_content) != null) {
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.base_content, ShowsFragment.newInstance("A", "B"));
+                ft.replace(R.id.base_content, ShowsFragment.newInstance());
                 ft.commit();
             }
         }

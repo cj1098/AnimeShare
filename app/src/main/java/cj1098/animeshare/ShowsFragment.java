@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -47,22 +48,14 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    private UserListAdapter adapter;
     private ProgressBar animatedLoader;
-    private GridView mGridView;
     private RecyclerView mRecyclerView;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private GridLayoutManager mLayoutManager;
     private RecyclerView.Adapter mAdapter;
     private ArrayList<ListItem> userList = new ArrayList<ListItem>();
-    private int currentVisibleItemCount;
-    private int currentScrollState;
     private boolean isLoading = false;
     private int startingId = 1;
     private int endingId = 10;
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private OnFragmentInteractionListener mListener;
 
@@ -70,16 +63,12 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment ShowsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ShowsFragment newInstance(String param1, String param2) {
+    public static ShowsFragment newInstance() {
         ShowsFragment fragment = new ShowsFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -92,8 +81,6 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
 
@@ -103,7 +90,7 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_shows, container, false);
 
-        mGridView = (GridView)v.findViewById(R.id.user_gridlist);
+        mRecyclerView = (RecyclerView)v.findViewById(R.id.user_gridlist);
         animatedLoader = (ProgressBar)v.findViewById(R.id.gridview_loader);
         initControls();
         return v;
@@ -158,34 +145,17 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
     }
 
     /**
-     * setup the gridView and tell it to listen for scroll changes and act accordingly.
+     * setup the recyclerview and tell it to listen for scroll changes and act accordingly.
      */
     private void initControls() {
 
-        adapter = new UserListAdapter(getActivity(), userList);
-        mGridView.setOnScrollListener(new AbsListView.OnScrollListener() {
+        mAdapter = new ShowsRecyclerAdapter(getActivity(), userList);
+        mLayoutManager = new GridLayoutManager(getActivity(), 2);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-                currentScrollState = scrollState;
-                if (mGridView.getLastVisiblePosition() == adapter.getCount() - 1 &&
-                        mGridView.getChildAt(mGridView.getChildCount() - 1).getBottom() <= mGridView.getHeight()) {
-                    isScrollCompleted();
-                }
-            }
-
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                currentVisibleItemCount = visibleItemCount;
-            }
-        });
-
-        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setTitle(userList.get(position).getTitle())
-                        .setMessage(userList.get(position).getSynopsis())
-                        .show();
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                isScrollCompleted();
             }
         });
     }
@@ -210,6 +180,7 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            animatedLoader.setVisibility(View.VISIBLE);
             /*pd = new ProgressDialog(UserList.this);
             pd.setMessage("Bare with me. We're loading a bunch'a shit right now..");
             pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -240,11 +211,9 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
                     HttpURLConnection conn = (HttpURLConnection)url.openConnection();
                     conn.setRequestMethod("GET");
                     conn.setRequestProperty("X-Mashape-Key", "rasJF18hhHmshDKpDzwpvlmZt5rAp1YrLFdjsn2XGCcBALFoQy");
-                    conn.setReadTimeout(15 * 1000);
                     InputStream is = conn.getInputStream();
                     InputStreamReader isw = new InputStreamReader(is);
                     BufferedReader bf = new BufferedReader(isw);
-                    StringBuilder stringBuilder = new StringBuilder();
 
                     String line = bf.readLine();
 
@@ -268,14 +237,13 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            //pd.cancel();
 
             if (isLoading) {
-                adapter.notifyDataSetChanged();
+                mAdapter.notifyDataSetChanged();
                 animatedLoader.setVisibility(View.GONE);
             }
             else {
-                mGridView.setAdapter(adapter);
+                mRecyclerView.setAdapter(mAdapter);
 
             }
         }
@@ -286,13 +254,12 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
      * it makes sure the scroll state is idle and check if you're currently loading data.
      */
     private void isScrollCompleted() {
-        if (currentVisibleItemCount > 0 && currentScrollState == GridView.OnScrollListener.SCROLL_STATE_IDLE) {
+        if ((mLayoutManager.findFirstVisibleItemPosition() + mLayoutManager.getChildCount()) >= mLayoutManager.getItemCount()) {
             if (!isLoading) {
                 isLoading = true;
                 endingId += 10;
                 task increment = new task();
                 increment.execute();
-                animatedLoader.setVisibility(View.VISIBLE);
             }
             else if (isLoading) {
                 isLoading = false;
