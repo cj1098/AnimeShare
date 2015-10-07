@@ -31,7 +31,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import cj1098.animeshare.userList.ListItem;
-import cj1098.animeshare.userList.UserListAdapter;
+import rx.Observable;
 
 
 /**
@@ -170,6 +170,10 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
 
     }
 
+    public interface MashapeService {
+        String SERVICE_ENDPOINT = "";
+    }
+
     public class task extends AsyncTask<Void, Integer, Void> {
         //ProgressDialog pd;
         JSONObject json;
@@ -188,6 +192,7 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
             pd.setMax(100);
             pd.show();*/
         }
+
 
         //this just takes an integer to update by. Just set it by whatever you need.
         @Override
@@ -266,5 +271,4 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
             }
         }
     }
-
 }
