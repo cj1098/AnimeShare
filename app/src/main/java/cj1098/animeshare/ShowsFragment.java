@@ -24,13 +24,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
+import cj1098.animeshare.service.AnimeRequestService;
 import cj1098.animeshare.userList.ListItem;
+import cj1098.animeshare.userList.UserList;
+import retrofit.Call;
+import retrofit.Callback;
+import retrofit.Response;
+import retrofit.Retrofit;
+import retrofit.http.GET;
+import retrofit.http.Path;
+import retrofit.Converter.Factory;
+import retrofit.http.Query;
 import rx.Observable;
 
 
@@ -47,6 +58,7 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String TAG = ShowsFragment.class.getName();
 
     private ProgressBar animatedLoader;
     private RecyclerView mRecyclerView;
@@ -163,15 +175,10 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
     private void setUpRecyclerView(View view) {
         //mRecyclerView = (RecyclerView)
 
-
     }
 
     private void setUpToolbar() {
 
-    }
-
-    public interface MashapeService {
-        String SERVICE_ENDPOINT = "";
     }
 
     public class task extends AsyncTask<Void, Integer, Void> {
@@ -261,10 +268,14 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
     private void isScrollCompleted() {
         if ((mLayoutManager.findFirstVisibleItemPosition() + mLayoutManager.getChildCount()) >= mLayoutManager.getItemCount()) {
             if (!isLoading) {
-                isLoading = true;
+
                 endingId += 10;
-                task increment = new task();
-                increment.execute();
+                isLoading = true;
+                AnimeRequestService service = new AnimeRequestService(isLoading, mRecyclerView, userList);
+                service.callService(endingId - 9, endingId);
+
+                /*task increment = new task();
+                increment.execute();*/
             }
             else if (isLoading) {
                 isLoading = false;

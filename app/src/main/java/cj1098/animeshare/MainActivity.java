@@ -2,6 +2,7 @@ package cj1098.animeshare;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
@@ -149,6 +150,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         else if(menuItem.getItemId() == R.id.navigation_item_2) {
             Snackbar.make(mToolbar, "2", Snackbar.LENGTH_SHORT).show();
+            if (getSupportFragmentManager().findFragmentById(R.id.base_content) != null) {
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.base_content, RadioStreamFragment.newInstance());
+                ft.commit();
+            }
         }
         else if (menuItem.getItemId() == R.id.navigation_item_3) {
 
