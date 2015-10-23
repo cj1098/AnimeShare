@@ -1,5 +1,6 @@
 package cj1098.animeshare.service;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import cj1098.animeshare.ShowsRecyclerAdapter;
 import cj1098.animeshare.userList.ListItem;
 import cj1098.animeshare.userList.UserList;
 import retrofit.Call;
@@ -36,11 +38,14 @@ public class AnimeRequestService {
     private final String TAG = AnimeRequestService.class.getName();
     private boolean isLoading;
     private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
     private ArrayList<ListItem> userList;
+    private Context context;
 
 
-    public AnimeRequestService(boolean isLoading, RecyclerView mRecyclerView, ArrayList<ListItem> userList) {
+    public AnimeRequestService(Context context, boolean isLoading, RecyclerView mRecyclerView, ArrayList<ListItem> userList) {
 
+        this.context = context;
         this.isLoading = isLoading;
         this.mRecyclerView = mRecyclerView;
         this.userList = userList;
@@ -76,22 +81,26 @@ public class AnimeRequestService {
             call.enqueue(new Callback<ListItem>() {
                 @Override
                 public void onResponse(Response<ListItem> response, Retrofit retrofit) {
-                    Log.i(TAG, response.body().getTitle());
-
                         userList.add(response.body());
                         if (response.body().getId() == endingId) {
                             if (isLoading) {
                                 mRecyclerView.getAdapter().notifyDataSetChanged();
                                 //call eventbus or something to tell the UI to update. It has loaded 10 items.
                             }
+                            else {
+                                mAdapter = new ShowsRecyclerAdapter(context, userList);
+                            }
                         }
                 }
-
                 @Override
                 public void onFailure(Throwable t) {
                     Log.i(TAG, t.toString());
                 }
             });
         }
+    }
+
+    public void setAdapter(RecyclerView.Adapter adapter) {
+        this.mAdapter = adapter;
     }
 }

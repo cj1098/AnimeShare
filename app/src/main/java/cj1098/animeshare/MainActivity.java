@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         setUpToolbar();
         setUpNavDrawer();
-        //setupRecyclerView();
 
     }
 
@@ -92,11 +91,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void setUpToolbar() {
         mToolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-        //getSupportActionBar().setLogo(R.drawable.logo);
     }
 
     private void setUpRecyclerView() {
-        //mRecyclerView = (RecyclerView)findViewById(R.id.main_list);
         mLayoutManager = new LinearLayoutManager(this);
         mAdapter = new DrawerRecyclerAdapter(this, new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.drawer_items))));
         mRecyclerView.setLayoutManager(mLayoutManager);

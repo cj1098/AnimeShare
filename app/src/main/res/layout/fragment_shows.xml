@@ -6,11 +6,9 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/user_gridlist"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:stretchMode="columnWidth"
-        android:verticalSpacing="0dp"
-        android:horizontalSpacing="0dp"></android.support.v7.widget.RecyclerView>
+        android:layout_height="match_parent"
+        android:stretchMode="none"
+        />
 
     <ProgressBar
         android:id="@+id/api_load_progress"

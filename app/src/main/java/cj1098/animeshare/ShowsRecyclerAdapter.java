@@ -36,7 +36,7 @@ public class ShowsRecyclerAdapter extends RecyclerView.Adapter<ShowsRecyclerAdap
                 .showImageForEmptyUri(R.drawable.ic_launcher)
                 .resetViewBeforeLoading(true)
                 .cacheInMemory(true)
-                .imageScaleType(ImageScaleType.EXACTLY)
+                .imageScaleType(ImageScaleType.NONE_SAFE)
                 .bitmapConfig(Bitmap.Config.RGB_565)
                 .considerExifParams(true)
                 .displayer(new FadeInBitmapDisplayer(300))
@@ -88,6 +88,8 @@ public class ShowsRecyclerAdapter extends RecyclerView.Adapter<ShowsRecyclerAdap
                 holder.pb.setVisibility(View.GONE);
             }
         });
+        holder.image.setPadding(0,0,0,0);
+        holder.image.setAdjustViewBounds(true);
         //Picasso.with(context).setIndicatorsEnabled(true);
         //Picasso.with(context).load(data.get(position).getCover_image()).resize(100, 100).placeholder(R.drawable.logo).error(R.drawable.code_geass).into(holder.image);
 

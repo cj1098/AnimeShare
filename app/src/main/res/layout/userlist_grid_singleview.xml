@@ -5,8 +5,8 @@
 
     <ImageView
         android:id="@+id/anime_image"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
     <ProgressBar
         android:id="@+id/image_loader"
         android:layout_width="56dp"
@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:numStars="5"
         style="?android:attr/ratingBarStyleSmall"
-        android:layout_above="@id/anime_image"/>
+        android:layout_below="@id/anime_title"/>
 
 
 </RelativeLayout>

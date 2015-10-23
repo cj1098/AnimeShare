@@ -31,6 +31,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
+import cj1098.animeshare.CustomViews.SpacesItemDecoration;
 import cj1098.animeshare.service.AnimeRequestService;
 import cj1098.animeshare.userList.ListItem;
 import cj1098.animeshare.userList.UserList;
@@ -113,8 +114,8 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
     public void onResume() {
         super.onResume();
 
-        task task = new task();
-        task.execute();
+        AnimeRequestService service = new AnimeRequestService(getActivity(), isLoading, mRecyclerView, userList);
+        service.callService(endingId - 9, endingId);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -162,7 +163,8 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
     private void initControls() {
 
         mAdapter = new ShowsRecyclerAdapter(getActivity(), userList);
-        mLayoutManager = new GridLayoutManager(getActivity(), 2);
+        mLayoutManager = new GridLayoutManager(getActivity(), 3);
+        mRecyclerView.addItemDecoration(new SpacesItemDecoration(50));
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -271,7 +273,7 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
 
                 endingId += 10;
                 isLoading = true;
-                AnimeRequestService service = new AnimeRequestService(isLoading, mRecyclerView, userList);
+                AnimeRequestService service = new AnimeRequestService(getActivity(), isLoading, mRecyclerView, userList);
                 service.callService(endingId - 9, endingId);
 
                 /*task increment = new task();
