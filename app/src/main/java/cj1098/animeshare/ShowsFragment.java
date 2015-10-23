@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -166,6 +167,9 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
         mLayoutManager = new GridLayoutManager(getActivity(), 3);
         mRecyclerView.addItemDecoration(new SpacesItemDecoration(50));
         mRecyclerView.setLayoutManager(mLayoutManager);
+        DefaultItemAnimator itemAnimator = new DefaultItemAnimator();
+        itemAnimator.setSupportsChangeAnimations(false);
+        mRecyclerView.setItemAnimator(itemAnimator);
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -268,7 +272,7 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
      * it makes sure the scroll state is idle and check if you're currently loading data.
      */
     private void isScrollCompleted() {
-        if ((mLayoutManager.findFirstVisibleItemPosition() + mLayoutManager.getChildCount()) >= mLayoutManager.getItemCount()) {
+        if ((mLayoutManager.findFirstVisibleItemPosition() + mLayoutManager.getChildCount()) >= mLayoutManager.getItemCount() - 6) {
             if (!isLoading) {
 
                 endingId += 10;

@@ -39,7 +39,6 @@ public class ShowsRecyclerAdapter extends RecyclerView.Adapter<ShowsRecyclerAdap
                 .imageScaleType(ImageScaleType.NONE_SAFE)
                 .bitmapConfig(Bitmap.Config.RGB_565)
                 .considerExifParams(true)
-                .displayer(new FadeInBitmapDisplayer(300))
                 .build();
     }
 

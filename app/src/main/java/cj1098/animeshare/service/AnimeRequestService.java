@@ -1,6 +1,7 @@
 package cj1098.animeshare.service;
 
 import android.content.Context;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -89,6 +90,8 @@ public class AnimeRequestService {
                             }
                             else {
                                 mAdapter = new ShowsRecyclerAdapter(context, userList);
+                                mAdapter.setHasStableIds(true);
+                                mRecyclerView.setAdapter(mAdapter);
                             }
                         }
                 }
@@ -100,7 +103,4 @@ public class AnimeRequestService {
         }
     }
 
-    public void setAdapter(RecyclerView.Adapter adapter) {
-        this.mAdapter = adapter;
-    }
 }
