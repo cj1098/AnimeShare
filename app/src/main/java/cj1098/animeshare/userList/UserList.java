@@ -1,9 +1,7 @@
 package cj1098.animeshare.userList;
 
-
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,17 +10,16 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -33,7 +30,6 @@ import cj1098.animeshare.R;
  * a progress bar for when the user first goes into the list. Otherwise
  * it's just a blank white screen.
  */
-
 public class UserList extends Activity {
     private UserListAdapter adapter;
     private ProgressBar animatedLoader;
@@ -49,7 +45,7 @@ public class UserList extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.userlist_grid);
-        task task = new task();
+        Task task = new Task();
         task.execute();
         initControls();
     }
@@ -58,8 +54,8 @@ public class UserList extends Activity {
      * setup the gridView and tell it to listen for scroll changes and act accordingly.
      */
     private void initControls() {
-        mGridView = (GridView)findViewById(R.id.user_gridlist);
-        animatedLoader = (ProgressBar)findViewById(R.id.gridview_loader);
+        mGridView = (GridView) findViewById(R.id.user_gridlist);
+        animatedLoader = (ProgressBar) findViewById(R.id.gridview_loader);
 
         adapter = new UserListAdapter(this, userList);
         mGridView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -89,8 +85,7 @@ public class UserList extends Activity {
         });
     }
 
-
-    public class task extends AsyncTask<Void, Integer, Void> {
+    public class Task extends AsyncTask<Void, Integer, Void> {
         //ProgressDialog pd;
         JSONObject json;
 
@@ -118,16 +113,17 @@ public class UserList extends Activity {
         /**
          * httpGet to hummingBird-v1 api to get JSON objects back and parse them using jackson. (Really cool) parcelable.com
          * Also publishes the progress of the process to the user via a progressBar
+         *
          * @param params
          * @return
          */
         @Override
         protected Void doInBackground(Void... params) {
-            try{
+            try {
                 ObjectMapper mapper = new ObjectMapper();
-                for (;startingId <= endingId; startingId++) {
+                for (; startingId <= endingId; startingId++) {
                     URL url = new URL("https://hummingbirdv1.p.mashape.com/anime/" + startingId);
-                    HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestMethod("GET");
                     conn.setRequestProperty("X-Mashape-Key", "rasJF18hhHmshDKpDzwpvlmZt5rAp1YrLFdjsn2XGCcBALFoQy");
                     conn.setReadTimeout(15 * 1000);
@@ -143,7 +139,7 @@ public class UserList extends Activity {
                     publishProgress(1);
                 }
 
-            }catch(Exception e){
+            } catch (Exception e) {
                 Log.e("log_tag", "Error in http connection " + e.toString());
             }
             return null;
@@ -153,6 +149,7 @@ public class UserList extends Activity {
          * This is for checking if the user has initially loaded the list or if they're in the process of loading more data for the list.
          * if they're loading the list for the first time, then set the adapter. Otherwise, notify the adapter that the data set has changed
          * and tell it to re-instantiate its views.
+         *
          * @param aVoid
          */
         @Override
@@ -163,14 +160,12 @@ public class UserList extends Activity {
             if (isLoading) {
                 adapter.notifyDataSetChanged();
                 animatedLoader.setVisibility(View.GONE);
-            }
-            else {
+            } else {
                 mGridView.setAdapter(adapter);
 
             }
         }
     }
-
 
     /**
      * I'll try my best to explain this. This checks if the user has finished their scroll "action"
@@ -181,18 +176,12 @@ public class UserList extends Activity {
             if (!isLoading) {
                 isLoading = true;
                 endingId += 10;
-                task increment = new task();
+                Task increment = new Task();
                 increment.execute();
                 animatedLoader.setVisibility(View.VISIBLE);
-            }
-            else if (isLoading) {
+            } else if (isLoading) {
                 isLoading = false;
             }
         }
     }
-
-
-
-
-
 }

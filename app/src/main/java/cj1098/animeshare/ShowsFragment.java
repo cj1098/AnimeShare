@@ -1,12 +1,10 @@
 package cj1098.animeshare;
 
-import android.app.Activity;
-import android.app.AlertDialog;
+import android.app.Fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,9 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.ProgressBar;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -25,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -35,16 +29,6 @@ import java.util.ArrayList;
 import cj1098.animeshare.CustomViews.SpacesItemDecoration;
 import cj1098.animeshare.service.AnimeRequestService;
 import cj1098.animeshare.userList.ListItem;
-import cj1098.animeshare.userList.UserList;
-import retrofit.Call;
-import retrofit.Callback;
-import retrofit.Response;
-import retrofit.Retrofit;
-import retrofit.http.GET;
-import retrofit.http.Path;
-import retrofit.Converter.Factory;
-import retrofit.http.Query;
-import rx.Observable;
 
 
 /**
@@ -104,8 +88,8 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_shows, container, false);
 
-        mRecyclerView = (RecyclerView)v.findViewById(R.id.user_gridlist);
-        animatedLoader = (ProgressBar)v.findViewById(R.id.gridview_loader);
+        mRecyclerView = (RecyclerView) v.findViewById(R.id.user_gridlist);
+        animatedLoader = (ProgressBar) v.findViewById(R.id.gridview_loader);
         initControls();
         return v;
     }
@@ -155,7 +139,7 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
+        void onFragmentInteraction(Uri uri);
     }
 
     /**
@@ -187,7 +171,8 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
 
     }
 
-    public class task extends AsyncTask<Void, Integer, Void> {
+    // TODO: remove if not using
+    public class Task extends AsyncTask<Void, Integer, Void> {
         //ProgressDialog pd;
         JSONObject json;
 
@@ -217,16 +202,17 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
         /**
          * httpGet to hummingBird-v1 api to get JSON objects back and parse them using jackson. (Really cool) parcelable.com
          * Also publishes the progress of the process to the user via a progressBar
+         *
          * @param params
          * @return
          */
         @Override
         protected Void doInBackground(Void... params) {
-            try{
+            try {
                 ObjectMapper mapper = new ObjectMapper();
-                for (;startingId <= endingId; startingId++) {
+                for (; startingId <= endingId; startingId++) {
                     URL url = new URL("https://hummingbirdv1.p.mashape.com/anime/" + startingId);
-                    HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestMethod("GET");
                     conn.setRequestProperty("X-Mashape-Key", "rasJF18hhHmshDKpDzwpvlmZt5rAp1YrLFdjsn2XGCcBALFoQy");
                     InputStream is = conn.getInputStream();
@@ -240,7 +226,7 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
                     publishProgress(1);
                 }
 
-            }catch(Exception e){
+            } catch (Exception e) {
                 Log.e("log_tag", "Error in http connection " + e.toString());
             }
             return null;
@@ -250,6 +236,7 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
          * This is for checking if the user has initially loaded the list or if they're in the process of loading more data for the list.
          * if they're loading the list for the first time, then set the adapter. Otherwise, notify the adapter that the data set has changed
          * and tell it to re-instantiate its views.
+         *
          * @param aVoid
          */
         @Override
@@ -259,8 +246,7 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
             if (isLoading) {
                 mAdapter.notifyDataSetChanged();
                 animatedLoader.setVisibility(View.GONE);
-            }
-            else {
+            } else {
                 mRecyclerView.setAdapter(mAdapter);
 
             }
@@ -280,10 +266,9 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
                 AnimeRequestService service = new AnimeRequestService(getActivity(), isLoading, mRecyclerView, userList);
                 service.callService(endingId - 9, endingId);
 
-                /*task increment = new task();
+                /*Task increment = new Task();
                 increment.execute();*/
-            }
-            else if (isLoading) {
+            } else {
                 isLoading = false;
             }
         }

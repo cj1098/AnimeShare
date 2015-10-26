@@ -1,10 +1,8 @@
 package cj1098.animeshare.service;
 
 import android.content.Context;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
 
 import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
@@ -12,44 +10,41 @@ import com.squareup.okhttp.Request;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import cj1098.animeshare.ShowsRecyclerAdapter;
 import cj1098.animeshare.userList.ListItem;
-import cj1098.animeshare.userList.UserList;
 import retrofit.Call;
 import retrofit.Callback;
-import retrofit.GsonConverterFactory;
 import retrofit.JacksonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 import retrofit.http.GET;
 import retrofit.http.Path;
-import retrofit.http.Query;
-import rx.Observable;
-import rx.functions.Func1;
 
 /**
  * Created by chrisjohnson on 20/10/15.
  */
 public class AnimeRequestService {
-    public static String MASHAPE_BASE_URL = "https://hummingbirdv1.p.mashape.com";
-    private static String MASHAPE_DEBUG_KEY = "rasJF18hhHmshDKpDzwpvlmZt5rAp1YrLFdjsn2XGCcBALFoQy";
-    private final MashapeService mashapeService;
-    private final String TAG = AnimeRequestService.class.getName();
-    private boolean isLoading;
+    private static final String TAG = AnimeRequestService.class.getName();
+
+    public static final String MASHAPE_BASE_URL = "https://hummingbirdv1.p.mashape.com";
+
+    private static final String MASHAPE_DEBUG_KEY = "rasJF18hhHmshDKpDzwpvlmZt5rAp1YrLFdjsn2XGCcBALFoQy";
+
+    private final MashapeService mMashapeService;
+    private boolean mIsLoading;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
-    private ArrayList<ListItem> userList;
-    private Context context;
+    private ArrayList<ListItem> mUserList;
+    private Context mContext;
 
 
     public AnimeRequestService(Context context, boolean isLoading, RecyclerView mRecyclerView, ArrayList<ListItem> userList) {
-
-        this.context = context;
-        this.isLoading = isLoading;
+        this.mContext = context; // TODO do we need to worry about holding onto this Context?
+        this.mIsLoading = isLoading;
         this.mRecyclerView = mRecyclerView;
-        this.userList = userList;
+        this.mUserList = userList;
+
         OkHttpClient client = new OkHttpClient();
         client.networkInterceptors().add(new Interceptor() {
             @Override
@@ -66,10 +61,8 @@ public class AnimeRequestService {
                 .client(client)
                 .build();
 
-        mashapeService = retrofit.create(MashapeService.class);
-
+        mMashapeService = retrofit.create(MashapeService.class);
     }
-
 
     public interface MashapeService {
         @GET("/anime/{id}")
@@ -78,23 +71,23 @@ public class AnimeRequestService {
 
     public void callService(int startingId, final int endingId) {
         for (; startingId <= endingId; startingId++) {
-            Call<ListItem> call = mashapeService.fetchList(startingId);
+            Call<ListItem> call = mMashapeService.fetchList(startingId);
             call.enqueue(new Callback<ListItem>() {
                 @Override
                 public void onResponse(Response<ListItem> response, Retrofit retrofit) {
-                        userList.add(response.body());
-                        if (response.body().getId() == endingId) {
-                            if (isLoading) {
-                                mRecyclerView.getAdapter().notifyDataSetChanged();
-                                //call eventbus or something to tell the UI to update. It has loaded 10 items.
-                            }
-                            else {
-                                mAdapter = new ShowsRecyclerAdapter(context, userList);
-                                mAdapter.setHasStableIds(true);
-                                mRecyclerView.setAdapter(mAdapter);
-                            }
+                    mUserList.add(response.body());
+                    if (response.body().getId() == endingId) {
+                        if (mIsLoading) {
+                            mRecyclerView.getAdapter().notifyDataSetChanged();
+                            //call eventbus or something to tell the UI to update. It has loaded 10 items.
+                        } else {
+                            mAdapter = new ShowsRecyclerAdapter(mContext, mUserList);
+                            mAdapter.setHasStableIds(true);
+                            mRecyclerView.setAdapter(mAdapter);
                         }
+                    }
                 }
+
                 @Override
                 public void onFailure(Throwable t) {
                     Log.i(TAG, t.toString());
@@ -102,5 +95,4 @@ public class AnimeRequestService {
             });
         }
     }
-
 }

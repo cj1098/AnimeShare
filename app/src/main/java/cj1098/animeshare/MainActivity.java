@@ -1,11 +1,5 @@
 package cj1098.animeshare;
 
-import android.app.ActionBar;
-import android.app.Activity;
-import android.app.Fragment;
-import android.content.Intent;
-import android.content.res.Configuration;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,20 +17,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import cj1098.animeshare.userList.UserList;
 
-
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
-    ,ShowsFragment.OnFragmentInteractionListener{
-    public static HashMap<String, Drawable> cachedImages;
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
+        ShowsFragment.OnFragmentInteractionListener {
+    public static HashMap<String, Drawable> sCachedImages;
     private Toolbar mToolbar;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -89,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     private void setUpToolbar() {
-        mToolbar = (Toolbar)findViewById(R.id.toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
     }
 
@@ -120,8 +109,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     super.onDrawerClosed(drawerView);
                 }
             };
-            mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-            mNavView = (NavigationView)findViewById(R.id.main_nav);
+            mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+            mNavView = (NavigationView) findViewById(R.id.main_nav);
             mNavView.setNavigationItemSelectedListener(this);
             mDrawerLayout.setDrawerListener(mDrawerToggle);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -137,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(MenuItem menuItem) {
+        // TODO: replace with switch
         if (menuItem.getItemId() == R.id.navigation_item_1) {
             Snackbar.make(mToolbar, "1", Snackbar.LENGTH_SHORT).show();
             if (getSupportFragmentManager().findFragmentById(R.id.base_content) != null) {
@@ -144,25 +134,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 ft.replace(R.id.base_content, ShowsFragment.newInstance());
                 ft.commit();
             }
-        }
-        else if(menuItem.getItemId() == R.id.navigation_item_2) {
+        } else if (menuItem.getItemId() == R.id.navigation_item_2) {
             Snackbar.make(mToolbar, "2", Snackbar.LENGTH_SHORT).show();
             if (getSupportFragmentManager().findFragmentById(R.id.base_content) != null) {
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.base_content, RadioStreamFragment.newInstance());
                 ft.commit();
             }
-        }
-        else if (menuItem.getItemId() == R.id.navigation_item_3) {
+        } else if (menuItem.getItemId() == R.id.navigation_item_3) {
 
-        }
-        else if (menuItem.getItemId() == R.id.navigation_item_4) {
+        } else if (menuItem.getItemId() == R.id.navigation_item_4) {
 
-        }
-        else if (menuItem.getItemId() == R.id.navigation_item_5) {
+        } else if (menuItem.getItemId() == R.id.navigation_item_5) {
 
-        }
-        else {
+        } else {
 
         }
         menuItem.setChecked(true);
