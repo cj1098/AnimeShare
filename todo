@@ -1,0 +1,20 @@
+Drawer menu will have lots of options. Currently there's only 6
+
+main - list of anime (will want to expand on this to include suggested anime, friends anime lists etc. This will all be accessible from the AB?)
+share - share your favorite list with friends
+music - either links to sites for anime/japanese music or japanese radio
+conventions - listing of nearest anime conventions in an area you specify
+feedback - same as support essentially
+support - same as feedback essentially although maybe a live component
+settings - push notifications etc
+
+currently i'm getting the list of anime from an API called mashape
+https://hummingbirdv1.p.mashape.com/anime/
+
+for the suggested anime api-http://myanimelist.net/modules.php?go=api
+
+
+I'm going to try using either realm or another ORM DB for storage on the users device
+For offline storage I have a mysql DB at home and a LAMP stack that holds data right now.
+Although I would like to instead use a cloud implementation and store data there.
+With android studio's new cloud features we can build our own Endpoints and deploy them with the app
