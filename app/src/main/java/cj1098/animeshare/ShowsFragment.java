@@ -88,8 +88,8 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_shows, container, false);
 
-        mRecyclerView = (RecyclerView) v.findViewById(R.id.user_gridlist);
-        animatedLoader = (ProgressBar) v.findViewById(R.id.gridview_loader);
+        mRecyclerView = (RecyclerView)v.findViewById(R.id.user_gridlist);
+        animatedLoader = (ProgressBar)v.findViewById(R.id.gridview_loader);
         initControls();
         return v;
     }
