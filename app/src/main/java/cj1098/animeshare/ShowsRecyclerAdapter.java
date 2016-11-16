@@ -4,6 +4,7 @@ package cj1098.animeshare;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,96 +14,82 @@ import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
-import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import cj1098.animeshare.userList.ListItem;
 
 public class ShowsRecyclerAdapter extends RecyclerView.Adapter<ShowsRecyclerAdapter.ShowsViewHolder> {
-    Context context;
-    ArrayList<ListItem> data;
-    DisplayImageOptions options;
+    private Context mContext;
+    private ArrayList<ListItem> mShowObjects;
 
     public ShowsRecyclerAdapter(Context context, ArrayList<ListItem> data) {
-        this.context = context;
-        this.data = data;
-        options = new DisplayImageOptions.Builder()
-                .showImageForEmptyUri(R.drawable.ic_launcher)
-                .resetViewBeforeLoading(true)
-                .cacheInMemory(true)
-                .imageScaleType(ImageScaleType.NONE_SAFE)
-                .bitmapConfig(Bitmap.Config.RGB_565)
-                .considerExifParams(true)
-                .build();
+        this.mContext = context;
+        this.mShowObjects = data;
+        Collections.sort(mShowObjects);
     }
 
-
-    public static class ShowsViewHolder extends RecyclerView.ViewHolder {
-        TextView title;
-        TextView synopsis;
-        ImageView image;
-        RatingBar rb;
-        ProgressBar pb;
+    public static class ShowsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+        @BindView(R.id.anime_title) TextView title;
+        @BindView(R.id.anime_description) TextView synopsis;
+        @BindView(R.id.anime_image) ImageView image;
+        @BindView(R.id.anime_rating) RatingBar rb;
+        @BindView(R.id.image_loader) ProgressBar pb;
 
         public ShowsViewHolder(View itemView) {
             super(itemView);
-            title = (TextView)itemView.findViewById(R.id.anime_title);
-            synopsis = (TextView)itemView.findViewById(R.id.anime_description);
-            image = (ImageView)itemView.findViewById(R.id.anime_image);
-            rb = (RatingBar)itemView.findViewById(R.id.anime_rating);
-            pb = (ProgressBar)itemView.findViewById(R.id.image_loader);
+            ButterKnife.bind(this, itemView);
+        }
+
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()) {
+                case R.id.anime_image:
+                   break;
+            }
         }
     }
 
     @Override
     public ShowsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(context).inflate(R.layout.userlist_grid_singleview, parent, false);
-        ShowsViewHolder viewHolder = new ShowsViewHolder(v);
-        return viewHolder;
+        View v = LayoutInflater.from(mContext).inflate(R.layout.userlist_grid_singleview, parent, false);
+        return new ShowsViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(final ShowsViewHolder holder, final int position) {
-        ImageLoader.getInstance().displayImage(data.get(position).getCover_image(), holder.image, options, new SimpleImageLoadingListener() {
+        holder.pb.setVisibility(View.VISIBLE);
+        SimpleTarget showTarget = new SimpleTarget<Bitmap>() {
             @Override
-            public void onLoadingStarted(String imageUri, View view) {
-                super.onLoadingStarted(imageUri, view);
-                holder.pb.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-                super.onLoadingFailed(imageUri, view, failReason);
-            }
-
-            @Override
-            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                super.onLoadingComplete(imageUri, view, loadedImage);
+            public void onResourceReady(Bitmap bitmap, GlideAnimation glideAnimation) {
                 holder.pb.setVisibility(View.GONE);
+                holder.image.setImageBitmap(bitmap);
             }
-        });
-        holder.image.setPadding(0,0,0,0);
-        holder.image.setAdjustViewBounds(true);
-        //Picasso.with(context).setIndicatorsEnabled(true);
-        //Picasso.with(context).load(data.get(position).getCover_image()).resize(100, 100).placeholder(R.drawable.logo).error(R.drawable.code_geass).into(holder.image);
+        };
 
-        //image.setPlaceholderImage(R.drawable.ic_launcher);
-        //image.setImageUrl(getItem(position).getCover_image());
-        holder.title.setText(data.get(position).getTitle());
-        holder.rb.setRating(data.get(position).getCommunity_rating());
+        // not sure why Android studio is complaining here.. figure it out later. TODO
+        Glide.with(mContext)
+                .load(mShowObjects.get(holder.getAdapterPosition()).getCover_image())
+                .asBitmap()
+                .error(R.drawable.code_geass)
+                .into(showTarget);
+        holder.image.setAdjustViewBounds(true);
+        holder.title.setText(mShowObjects.get(holder.getAdapterPosition()).getTitle());
+        holder.rb.setRating(mShowObjects.get(holder.getAdapterPosition()).getCommunity_rating());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle(data.get(position).getTitle())
-                        .setMessage(data.get(position).getSynopsis())
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                builder.setTitle(mShowObjects.get(position).getTitle())
+                        .setMessage(mShowObjects.get(position).getSynopsis())
                         .show();
             }
         });
@@ -110,7 +97,7 @@ public class ShowsRecyclerAdapter extends RecyclerView.Adapter<ShowsRecyclerAdap
 
     @Override
     public int getItemCount() {
-        return data.size();
+        return mShowObjects.size();
     }
 
 }

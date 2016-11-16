@@ -12,10 +12,7 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
@@ -25,8 +22,6 @@ public class UserListAdapter extends BaseAdapter {
     ArrayList<ListItem> data;
     LayoutInflater mInflater;
     Context context;
-    ImageLoader imageLoader = ImageLoader.getInstance();
-    DisplayImageOptions options;
 
     /**
      * constructor.
@@ -36,10 +31,6 @@ public class UserListAdapter extends BaseAdapter {
     public UserListAdapter(Context context, ArrayList<ListItem> data) {
         this.context = context;
         this.data = data;
-        options = new DisplayImageOptions.Builder()
-                .cacheOnDisk(true).cacheInMemory(true)
-                .imageScaleType(ImageScaleType.EXACTLY)
-                .displayer(new FadeInBitmapDisplayer(300)).build();
     }
 
 
@@ -138,7 +129,7 @@ public class UserListAdapter extends BaseAdapter {
         So maybe I can fix that and use it instead.
          */
         //image.setBackground(new BitmapDrawable(context.getResources(), imageLoader.loadImageSync(getItem(position).getCover_image(), options)));
-        ImageLoader.getInstance().displayImage(getItem(position).getCover_image(), image, options);
+        Glide.with(context).load(getItem(position).getCover_image()).into(image);
         //image.setPlaceholderImage(R.drawable.ic_launcher);
         //image.setImageUrl(getItem(position).getCover_image());
         title.setText(getItem(position).getTitle());

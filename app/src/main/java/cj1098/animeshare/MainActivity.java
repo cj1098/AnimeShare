@@ -1,7 +1,6 @@
 package cj1098.animeshare;
 
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -9,7 +8,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,8 +21,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
-        ShowsFragment.OnFragmentInteractionListener {
+public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
     public static HashMap<String, Drawable> sCachedImages;
     private Toolbar mToolbar;
     private RecyclerView mRecyclerView;
@@ -39,15 +36,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (getSupportFragmentManager().findFragmentById(R.id.base_content) == null) {
+        // if our savedInstanceState is null that means the user is in the app without a previous instance.
+        // add everything from scratch
+        if (savedInstanceState == null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.add(R.id.base_content, ShowsFragment.newInstance());
             ft.commit();
         }
+        // otherwise, re-initialize everything here.
+        else {
+
+        }
 
         setUpToolbar();
         setUpNavDrawer();
-
     }
 
     @Override
@@ -156,8 +158,4 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return false;
     }
 
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
 }

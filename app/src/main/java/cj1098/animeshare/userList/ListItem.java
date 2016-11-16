@@ -9,7 +9,7 @@ import java.util.ArrayList;
 /**
  * Created by chris on 12/28/14.
  */
-public class ListItem implements Parcelable {
+public class ListItem implements Parcelable, Comparable<ListItem>{
 
     private int id;
     private int mal_id;
@@ -279,4 +279,17 @@ public class ListItem implements Parcelable {
             return new ListItem[size];
         }
     };
+
+    @Override
+    public int compareTo(ListItem listItem) {
+        if (id > listItem.getId()) {
+            return 1;
+        }
+        else if (id < listItem.getId()) {
+            return -1;
+        }
+        else {
+            return 0;
+        }
+    }
 }

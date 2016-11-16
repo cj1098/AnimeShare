@@ -4,22 +4,22 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
-import com.squareup.okhttp.Interceptor;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
 import cj1098.animeshare.ShowsRecyclerAdapter;
 import cj1098.animeshare.userList.ListItem;
-import retrofit.Call;
-import retrofit.Callback;
-import retrofit.JacksonConverterFactory;
-import retrofit.Response;
-import retrofit.Retrofit;
-import retrofit.http.GET;
-import retrofit.http.Path;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.converter.jackson.JacksonConverterFactory;
+import retrofit2.Retrofit;
+import retrofit2.http.GET;
+import retrofit2.http.Path;
 
 /**
  * Created by chrisjohnson on 20/10/15.
@@ -45,15 +45,15 @@ public class AnimeRequestService {
         this.mRecyclerView = mRecyclerView;
         this.mUserList = userList;
 
-        OkHttpClient client = new OkHttpClient();
-        client.networkInterceptors().add(new Interceptor() {
-            @Override
-            public com.squareup.okhttp.Response intercept(Chain chain) throws IOException {
-                chain.request().newBuilder().addHeader("Accept", "application/json");
-                Request request = chain.request().newBuilder().addHeader("X-Mashape-Key", MASHAPE_DEBUG_KEY).addHeader("accept", "application/json").build();
-                return chain.proceed(request);
-            }
-        });
+        OkHttpClient client = new OkHttpClient.Builder()
+                            .addInterceptor(new Interceptor() {
+                                @Override
+                                public Response intercept(Chain chain) throws IOException {
+                                    chain.request().newBuilder().addHeader("Accept", "application/json");
+                                    Request request = chain.request().newBuilder().addHeader("X-Mashape-Key", MASHAPE_DEBUG_KEY).addHeader("accept", "application/json").build();
+                                    return chain.proceed(request);
+                                }
+                            }).build();
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(MASHAPE_BASE_URL)
@@ -74,7 +74,7 @@ public class AnimeRequestService {
             Call<ListItem> call = mMashapeService.fetchList(startingId);
             call.enqueue(new Callback<ListItem>() {
                 @Override
-                public void onResponse(Response<ListItem> response, Retrofit retrofit) {
+                public void onResponse(Call<ListItem> call, retrofit2.Response<ListItem> response) {
                     mUserList.add(response.body());
                     if (response.body().getId() == endingId) {
                         if (mIsLoading) {
@@ -89,8 +89,8 @@ public class AnimeRequestService {
                 }
 
                 @Override
-                public void onFailure(Throwable t) {
-                    Log.i(TAG, t.toString());
+                public void onFailure(Call<ListItem> call, Throwable t) {
+                    Log.e(TAG, t.toString());
                 }
             });
         }
