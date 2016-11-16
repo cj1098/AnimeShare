@@ -33,9 +33,6 @@ import cj1098.animeshare.userList.ListItem;
 
 /**
  * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ShowsFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
  * Use the {@link ShowsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
@@ -84,8 +81,8 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_shows, container, false);
 
-        mRecyclerView = (RecyclerView) v.findViewById(R.id.user_gridlist);
-        animatedLoader = (ProgressBar) v.findViewById(R.id.gridview_loader);
+        mRecyclerView = (RecyclerView)v.findViewById(R.id.user_gridlist);
+        animatedLoader = (ProgressBar)v.findViewById(R.id.gridview_loader);
         initControls();
         return v;
     }

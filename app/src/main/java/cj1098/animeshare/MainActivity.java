@@ -53,10 +53,27 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (mDrawerLayout != null) {
+            boolean drawerOpen = mDrawerLayout.isDrawerOpen(GravityCompat.START);
+            menu.findItem(R.id.action_settings).setVisible(!drawerOpen);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        if (mDrawerToggle != null && savedInstanceState != null) {
+            mDrawerToggle.syncState();
+        }
     }
 
     @Override
@@ -104,11 +121,15 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 @Override
                 public void onDrawerOpened(View drawerView) {
                     super.onDrawerOpened(drawerView);
+                    mToolbar.setTitle("Options");
+                    invalidateOptionsMenu();
                 }
 
                 @Override
                 public void onDrawerClosed(View drawerView) {
                     super.onDrawerClosed(drawerView);
+                    mToolbar.setTitle("AnimeShare");
+                    invalidateOptionsMenu();
                 }
             };
             mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -116,7 +137,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             mNavView.setNavigationItemSelectedListener(this);
             mDrawerLayout.setDrawerListener(mDrawerToggle);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu);
             mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
