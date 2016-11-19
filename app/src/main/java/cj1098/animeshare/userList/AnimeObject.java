@@ -5,11 +5,12 @@ import android.os.Parcelable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
  * Created by chris on 12/28/14.
  */
-public class ListItem implements Parcelable, Comparable<ListItem>{
+public class AnimeObject implements Parcelable{
 
     private int id;
     private int mal_id;
@@ -29,11 +30,11 @@ public class ListItem implements Parcelable, Comparable<ListItem>{
     private String age_rating;
     private ArrayList<Name> genres;
 
-    public ListItem() {
+    public AnimeObject() {
     }
 
-    public ListItem(int id, int mal_id, String slug, String status, String url, String title, String alternate_title, int episode_count, int episode_length, String cover_image, String synopsis,
-                    String show_type, String started_airing, String finished_airing, float community_rating, String age_rating, ArrayList<Name> genres) {
+    public AnimeObject(int id, int mal_id, String slug, String status, String url, String title, String alternate_title, int episode_count, int episode_length, String cover_image, String synopsis,
+                       String show_type, String started_airing, String finished_airing, float community_rating, String age_rating, ArrayList<Name> genres) {
         this.id = id;
         this.mal_id = mal_id;
         this.slug = slug;
@@ -53,7 +54,7 @@ public class ListItem implements Parcelable, Comparable<ListItem>{
         this.genres = genres;
     }
 
-    protected ListItem(Parcel in) {
+    protected AnimeObject(Parcel in) {
         id = in.readInt();
         mal_id = in.readInt();
         slug = in.readString();
@@ -268,28 +269,23 @@ public class ListItem implements Parcelable, Comparable<ListItem>{
     }
 
     @SuppressWarnings("unused")
-    public static final Parcelable.Creator<ListItem> CREATOR = new Parcelable.Creator<ListItem>() {
+    public static final Parcelable.Creator<AnimeObject> CREATOR = new Parcelable.Creator<AnimeObject>() {
         @Override
-        public ListItem createFromParcel(Parcel in) {
-            return new ListItem(in);
+        public AnimeObject createFromParcel(Parcel in) {
+            return new AnimeObject(in);
         }
 
         @Override
-        public ListItem[] newArray(int size) {
-            return new ListItem[size];
+        public AnimeObject[] newArray(int size) {
+            return new AnimeObject[size];
         }
     };
 
-    @Override
-    public int compareTo(ListItem listItem) {
-        if (id > listItem.getId()) {
-            return 1;
-        }
-        else if (id < listItem.getId()) {
-            return -1;
-        }
-        else {
-            return 0;
+    public static class TitleComparator implements Comparator<AnimeObject> {
+        @Override
+        public int compare(AnimeObject object1, AnimeObject object2) {
+            return object1.getTitle().compareToIgnoreCase(object2.getTitle());
         }
     }
+
 }

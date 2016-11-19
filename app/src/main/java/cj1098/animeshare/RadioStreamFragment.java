@@ -1,10 +1,8 @@
 package cj1098.animeshare;
 
-import android.app.Activity;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
@@ -14,6 +12,8 @@ import android.widget.Button;
 
 import java.io.IOException;
 
+import cj1098.base.BaseFragment;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -22,7 +22,7 @@ import java.io.IOException;
  * Use the {@link RadioStreamFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RadioStreamFragment extends android.support.v4.app.Fragment {
+public class RadioStreamFragment extends BaseFragment {
 
 
     /**
@@ -33,8 +33,7 @@ public class RadioStreamFragment extends android.support.v4.app.Fragment {
      */
     // TODO: Rename and change types and number of parameters
     public static RadioStreamFragment newInstance() {
-        RadioStreamFragment fragment = new RadioStreamFragment();
-        return fragment;
+        return new RadioStreamFragment();
     }
 
     public RadioStreamFragment() {

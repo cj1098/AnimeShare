@@ -1,42 +1,34 @@
 package cj1098.animeshare;
 
-import android.app.Fragment;
-import android.content.Context;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 
 import cj1098.animeshare.CustomViews.SpacesItemDecoration;
 import cj1098.animeshare.service.AnimeRequestService;
-import cj1098.animeshare.userList.ListItem;
+import cj1098.animeshare.userList.AnimeObject;
+import cj1098.animeshare.util.NetworkUtil;
+import cj1098.base.BaseFragment;
+import cj1098.event.AnimeObjectReceivedEvent;
+import cj1098.event.NoNetworkEvent;
+import cj1098.event.RxBus;
+import cj1098.event.SlowNetworkEvent;
+import rx.subscriptions.CompositeSubscription;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * A simple {@link BaseFragment} subclass.
  * Use the {@link ShowsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ShowsFragment extends android.support.v4.app.Fragment {
+public class ShowsFragment extends BaseFragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String TAG = ShowsFragment.class.getName();
@@ -45,10 +37,11 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
     private RecyclerView mRecyclerView;
     private GridLayoutManager mLayoutManager;
     private RecyclerView.Adapter mAdapter;
-    private ArrayList<ListItem> userList = new ArrayList<ListItem>();
+    private ArrayList<AnimeObject> animeList = new ArrayList<AnimeObject>();
     private boolean isLoading = false;
-    private int startingId = 1;
     private int endingId = 10;
+    private NetworkUtil networkUtil;
+    private CompositeSubscription compositeSubscription;
 
     /**
      * Use this factory method to create a new instance of
@@ -71,8 +64,12 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (compositeSubscription == null) {
+            compositeSubscription = new CompositeSubscription();
+        }
         if (getArguments() != null) {
         }
+        compositeSubscription.add(RxBus.getInstance().register(AnimeObjectReceivedEvent.class, this::updateMainAnimeList));
     }
 
     @Override
@@ -91,19 +88,10 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
-        AnimeRequestService service = new AnimeRequestService(getActivity(), isLoading, mRecyclerView, userList);
-        service.callService(endingId - 9, endingId);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
+        if (NetworkUtil.isConnected(getContext())) {
+            AnimeRequestService service = new AnimeRequestService();
+            service.callService(endingId - 9, endingId);
+        }
     }
 
     /**
@@ -111,7 +99,7 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
      */
     private void initControls() {
 
-        mAdapter = new ShowsRecyclerAdapter(getActivity(), userList);
+        mAdapter = new ShowsRecyclerAdapter(getActivity(), animeList);
         mLayoutManager = new GridLayoutManager(getActivity(), 3);
         mRecyclerView.addItemDecoration(new SpacesItemDecoration(50));
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -136,12 +124,47 @@ public class ShowsFragment extends android.support.v4.app.Fragment {
 
                 endingId += 10;
                 isLoading = true;
-                AnimeRequestService service = new AnimeRequestService(getActivity(), isLoading, mRecyclerView, userList);
-                service.callService(endingId - 9, endingId);
+                //TODO: add a connected slow check and then post a slowNetwork event that would display either no network speed
+                //TODO: or a too slow to operate speed.
+                if (NetworkUtil.isConnected(getContext())) {
+                    AnimeRequestService service = new AnimeRequestService();
+                    service.callService(endingId - 9, endingId);
+                }
+                else if (!NetworkUtil.isConnectedFast(getContext())){
+                    SlowNetworkEvent slowNetworkEvent = new SlowNetworkEvent();
+                    RxBus.getInstance().post(slowNetworkEvent);
+                }
+                else {
+                    NoNetworkEvent noNetworkEvent = new NoNetworkEvent();
+                    RxBus.getInstance().post(noNetworkEvent);
+                }
 
             } else {
                 isLoading = false;
             }
         }
     }
+
+    private void updateMainAnimeList(AnimeObjectReceivedEvent event) {
+        if (!isDuplicateEntry(event.getAnimeObject())) {
+            animeList.add(event.getAnimeObject());
+        }
+        if (mLayoutManager.getChildCount() == 0) {
+            mAdapter = new ShowsRecyclerAdapter(getActivity(), animeList);
+            mRecyclerView.setAdapter(mAdapter);
+        }
+        else {
+            mAdapter.notifyItemInserted(animeList.indexOf(event.getAnimeObject()));
+        }
+    }
+
+    private boolean isDuplicateEntry(AnimeObject animeObject) {
+        for (int i = 0; i < animeList.size(); i++) {
+            if (animeObject.getId() == animeList.get(i).getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
