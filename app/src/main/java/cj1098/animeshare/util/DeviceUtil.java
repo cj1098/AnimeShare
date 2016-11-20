@@ -53,9 +53,8 @@ public class DeviceUtil {
     private Preference mPreferences;
     private String mUuid;
 
-    public DeviceUtil(Preference preferences, Context context) {
+    public DeviceUtil(Context context) {
         mContext = context;
-        mPreferences = preferences;
 
         generateUuid();
     }

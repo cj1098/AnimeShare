@@ -20,18 +20,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import cj1098.animeshare.home.HomeHeadlessFragment;
 import cj1098.base.BaseActivity;
 
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
     public static HashMap<String, Drawable> sCachedImages;
     private Toolbar mToolbar;
-    private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
     private DrawerRecyclerAdapter mAdapter;
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavView;
     private ActionBarDrawerToggle mDrawerToggle;
+
+    private HomeHeadlessFragment homeHeadlessFragment;
+    private AnimeListFragment animeListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,13 +44,13 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         // if our savedInstanceState is null that means the user is in the app without a previous instance.
         // add everything from scratch
         if (savedInstanceState == null) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(R.id.base_content, ShowsFragment.newInstance());
-            ft.commit();
+            addAnimeListFragment();
+            addHomeHeadlessFragment();
         }
         // otherwise, re-initialize everything here.
         else {
-
+            homeHeadlessFragment = (HomeHeadlessFragment)getSupportFragmentManager().findFragmentByTag(HomeHeadlessFragment.TAG);
+            animeListFragment =  (AnimeListFragment)getSupportFragmentManager().findFragmentByTag(AnimeListFragment.TAG);
         }
 
         setUpToolbar();
@@ -103,14 +106,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         setSupportActionBar(mToolbar);
     }
 
-    private void setUpRecyclerView() {
-        mLayoutManager = new LinearLayoutManager(this);
-        mAdapter = new DrawerRecyclerAdapter(this, new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.drawer_items))));
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-    }
-
     private void setUpNavDrawer() {
         if (mToolbar != null) {
             mDrawerToggle = new ActionBarDrawerToggle(
@@ -156,7 +151,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             Snackbar.make(mToolbar, "1", Snackbar.LENGTH_SHORT).show();
             if (getSupportFragmentManager().findFragmentById(R.id.base_content) != null) {
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.base_content, ShowsFragment.newInstance());
+                ft.replace(R.id.base_content, AnimeListFragment.newInstance());
                 ft.commit();
             }
         } else if (menuItem.getItemId() == R.id.navigation_item_2) {
@@ -179,6 +174,18 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         mDrawerLayout.closeDrawers();
 
         return false;
+    }
+
+    private void addHomeHeadlessFragment() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.add(HomeHeadlessFragment.newInstance(), HomeHeadlessFragment.TAG);
+        ft.commit();
+    }
+
+    private void addAnimeListFragment() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.add(R.id.base_content, AnimeListFragment.newInstance(), AnimeListFragment.TAG);
+        ft.commit();
     }
 
 }

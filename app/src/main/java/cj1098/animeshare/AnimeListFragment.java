@@ -25,40 +25,33 @@ import rx.subscriptions.CompositeSubscription;
 
 /**
  * A simple {@link BaseFragment} subclass.
- * Use the {@link ShowsFragment#newInstance} factory method to
+ * Use the {@link AnimeListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ShowsFragment extends BaseFragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String TAG = ShowsFragment.class.getName();
+public class AnimeListFragment extends BaseFragment {
+    public static final String TAG = AnimeListFragment.class.getName();
 
     private ProgressBar animatedLoader;
     private RecyclerView mRecyclerView;
     private GridLayoutManager mLayoutManager;
     private RecyclerView.Adapter mAdapter;
-    private ArrayList<AnimeObject> animeList = new ArrayList<AnimeObject>();
+    private ArrayList<AnimeObject> animeList = new ArrayList<>();
     private boolean isLoading = false;
     private int endingId = 10;
-    private NetworkUtil networkUtil;
     private CompositeSubscription compositeSubscription;
 
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment ShowsFragment.
+     * @return A new instance of fragment AnimeListFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ShowsFragment newInstance() {
-        ShowsFragment fragment = new ShowsFragment();
+    public static AnimeListFragment newInstance() {
+        AnimeListFragment fragment = new AnimeListFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
-    }
-
-    public ShowsFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -81,6 +74,10 @@ public class ShowsFragment extends BaseFragment {
         mRecyclerView = (RecyclerView)v.findViewById(R.id.user_gridlist);
         animatedLoader = (ProgressBar)v.findViewById(R.id.gridview_loader);
         initControls();
+        if (NetworkUtil.isConnected(getContext())) {
+            AnimeRequestService service = new AnimeRequestService();
+            service.callService(endingId - 9, endingId);
+        }
         return v;
     }
 
@@ -88,17 +85,12 @@ public class ShowsFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (NetworkUtil.isConnected(getContext())) {
-            AnimeRequestService service = new AnimeRequestService();
-            service.callService(endingId - 9, endingId);
-        }
     }
 
     /**
      * setup the recyclerview and tell it to listen for scroll changes and act accordingly.
      */
     private void initControls() {
-
         mAdapter = new ShowsRecyclerAdapter(getActivity(), animeList);
         mLayoutManager = new GridLayoutManager(getActivity(), 3);
         mRecyclerView.addItemDecoration(new SpacesItemDecoration(50));
@@ -122,7 +114,7 @@ public class ShowsFragment extends BaseFragment {
         if ((mLayoutManager.findFirstVisibleItemPosition() + mLayoutManager.getChildCount()) >= mLayoutManager.getItemCount() - 6) {
             if (!isLoading) {
 
-                endingId += 10;
+                endingId += 20;
                 isLoading = true;
                 //TODO: add a connected slow check and then post a slowNetwork event that would display either no network speed
                 //TODO: or a too slow to operate speed.

@@ -6,12 +6,15 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 
+import cj1098.animeshare.util.DaggerUtil;
+
 public class BaseActivity extends AppCompatActivity {
     public static final String TAG = BaseActivity.class.getSimpleName();
 
     @Override
     public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
         super.onCreate(savedInstanceState, persistentState);
+        DaggerUtil.getInstance().getApplicationComponent().inject(this);
     }
 
     @Override
