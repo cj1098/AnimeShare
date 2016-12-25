@@ -1,27 +1,20 @@
 package cj1098.animeshare.service;
 
-import android.content.Context;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
-import cj1098.event.AnimeObjectReceivedEvent;
-import cj1098.event.RxBus;
-import okhttp3.Interceptor;
+import cj1098.animeshare.util.DaggerUtil;
+import cj1098.animeshare.viewmodels.FullListResponse;
+import cj1098.event.InitialXMLParseFinishedEvent;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import javax.inject.Inject;
 
-import cj1098.animeshare.ShowsRecyclerAdapter;
-import cj1098.animeshare.userList.AnimeObject;
 import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.converter.jackson.JacksonConverterFactory;
 import retrofit2.Retrofit;
+import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 import retrofit2.http.GET;
-import retrofit2.http.Path;
 
 /**
  * Created by chrisjohnson on 20/10/15.
@@ -29,14 +22,17 @@ import retrofit2.http.Path;
 public class AnimeRequestService {
     private static final String TAG = AnimeRequestService.class.getName();
 
-    public static final String MASHAPE_BASE_URL = "https://hummingbirdv1.p.mashape.com";
+    private static final String MASHAPE_BASE_URL = "https://hummingbirdv1.p.mashape.com";
+
+    // ANN == Anime News network
+    private static final String ANN_BASE_URL = "http://www.animenewsnetwork.com/";
 
     private static final String MASHAPE_DEBUG_KEY = "rasJF18hhHmshDKpDzwpvlmZt5rAp1YrLFdjsn2XGCcBALFoQy";
 
     private final MashapeService mMashapeService;
 
-
     public AnimeRequestService() {
+        DaggerUtil.getInstance().getApplicationComponent().inject(this);
         OkHttpClient client = new OkHttpClient.Builder()
                             .addInterceptor(chain -> {
                                 chain.request().newBuilder().addHeader("Accept", "application/json");
@@ -45,34 +41,32 @@ public class AnimeRequestService {
                             }).build();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(MASHAPE_BASE_URL)
-                .addConverterFactory(JacksonConverterFactory.create())
+                .baseUrl(ANN_BASE_URL)
                 .client(client)
+                .addConverterFactory(SimpleXmlConverterFactory.create())
                 .build();
 
         mMashapeService = retrofit.create(MashapeService.class);
     }
 
     public interface MashapeService {
-        @GET("/anime/{id}")
-        Call<AnimeObject> getAnimeById(@Path("id") int id);
+        @GET("encyclopedia/reports.xml?id=155&nlist=all&type=anime")
+        Call<FullListResponse> getFullList();
     }
 
-    public void callService(int startingId, final int endingId) {
-        for (; startingId <= endingId; startingId++) {
-            Call<AnimeObject> call = mMashapeService.getAnimeById(startingId);
-            call.enqueue(new Callback<AnimeObject>() {
-                @Override
-                public void onResponse(Call<AnimeObject> call, retrofit2.Response<AnimeObject> response) {
-                    AnimeObjectReceivedEvent animeObjectReceivedEvent = new AnimeObjectReceivedEvent(response.body());
-                    RxBus.getInstance().post(animeObjectReceivedEvent);
-                }
+    public void fetchFullAnimeList() {
+        Call<FullListResponse> call = mMashapeService.getFullList();
+        call.enqueue(new Callback<FullListResponse>() {
+            @Override
+            public void onResponse(Call<FullListResponse> call, retrofit2.Response<FullListResponse> response) {
+                InitialXMLParseFinishedEvent event = new InitialXMLParseFinishedEvent(response.body().getItemList());
 
-                @Override
-                public void onFailure(Call<AnimeObject> call, Throwable t) {
-                    Log.e(TAG, t.toString());
-                }
-            });
-        }
+            }
+
+            @Override
+            public void onFailure(Call<FullListResponse> call, Throwable t) {
+                Log.d(TAG, t.toString());
+            }
+        });
     }
 }

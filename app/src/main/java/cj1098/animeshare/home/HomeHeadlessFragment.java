@@ -46,7 +46,7 @@ public class HomeHeadlessFragment extends BaseFragment implements HomeHeadlessMv
 
     @Override
     public void showNoNetworkDialog() {
-        Toast.makeText(getContext(), "asd", Toast.LENGTH_SHORT).show();
+
     }
 
     @Override

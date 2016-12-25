@@ -4,13 +4,17 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
 
 /**
  * Created by chris on 11/18/16.
  */
 
+@UiThread
 public class BaseFragment extends Fragment {
+
+    BaseDialogFragment baseDialogFragment;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

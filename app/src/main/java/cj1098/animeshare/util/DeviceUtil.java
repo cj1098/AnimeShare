@@ -55,8 +55,6 @@ public class DeviceUtil {
 
     public DeviceUtil(Context context) {
         mContext = context;
-
-        generateUuid();
     }
 
     public String getCarrier() {
@@ -188,55 +186,6 @@ public class DeviceUtil {
 
     public String getAndroidVersion() {
         return Build.VERSION.RELEASE;
-    }
-
-    @Nullable
-    public String getUuid() {
-        return mUuid;
-    }
-
-    private void generateUuid() {
-
-        try {
-            // TODO tsr: should mUuid ever be allowed to remain null?
-            //mUuid = mPreferences.getDeviceId();
-
-            if (mUuid != null) {
-                final byte[] decodedBytes = Base64.decode(mUuid, Base64.DEFAULT);
-                //mUuid = new String(CryptoUtil.decrypt(decodedBytes, CryptoUtil.createEncryptionKey()));
-            } else {
-                mUuid = getImei();
-
-                if (mUuid == null) {
-                    mUuid = getAndroidId();
-                }
-
-                if (mUuid == null) {
-                    mUuid = getWifiMacAddress();
-                }
-
-                if (mUuid == null) {
-                    mUuid = UUID.randomUUID().toString();
-                }
-
-                //final byte[] encrypted = CryptoUtil.encrypt(mUuid.getBytes(), CryptoUtil.createEncryptionKey());
-                //final String encodedDeviceID = android.util.Base64.encodeToString(encrypted, android.util.Base64.DEFAULT);
-                //mPreferences.setDeviceId(encodedDeviceID);
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Exception in generateUuid", e);
-        }
-    }
-
-    private String getImei() {
-        String imei = null;
-
-        final TelephonyManager telephonyManager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
-        if (telephonyManager != null) {
-            imei = telephonyManager.getDeviceId();
-        }
-
-        return imei;
     }
 
     private String getAndroidId() {

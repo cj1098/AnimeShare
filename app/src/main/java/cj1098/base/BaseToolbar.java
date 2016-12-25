@@ -22,5 +22,4 @@ public class BaseToolbar extends Toolbar {
         super(context, attrs, defStyleAttr);
     }
 
-
 }

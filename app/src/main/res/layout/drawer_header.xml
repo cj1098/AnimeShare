@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="150dp"
-    android:orientation="vertical">
+    android:layout_height="200dp"
+    android:orientation="vertical"
+    android:background="@color/Green">
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerInside"
-        android:background="@drawable/code_geass"/>
+    <cj1098.animeshare.CustomViews.RoundedImageView
+        android:id="@+id/user_profile_picture"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/code_geass"/>
 
     <TextView
         style="@style/drawer_text"
         android:layout_gravity="bottom"
-        android:text="Your Name Here" />
+        tools:text="@string/app_name"/>
 
 </FrameLayout>

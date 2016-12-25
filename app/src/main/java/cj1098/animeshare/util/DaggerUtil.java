@@ -4,6 +4,7 @@ import cj1098.animeshare.modules.ApplicationComponent;
 import cj1098.animeshare.modules.ContextModule;
 import cj1098.animeshare.modules.DaggerApplicationComponent_MainApplicationComponent;
 import cj1098.animeshare.modules.PresenterModule;
+import cj1098.animeshare.modules.UtilModule;
 import cj1098.base.BaseApplication;
 
 /**
@@ -22,6 +23,7 @@ public class DaggerUtil {
             ContextModule contextModule = new ContextModule(BaseApplication.getContext());
 
             mApplicationComponent = DaggerApplicationComponent_MainApplicationComponent.builder()
+                    .utilModule(new UtilModule())
                     .contextModule(contextModule)
                     .presenterModule(new PresenterModule())
                     .build();

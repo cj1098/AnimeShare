@@ -1,4 +1,4 @@
-package cj1098.animeshare;
+package cj1098.animeshare.animelist;
 
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -9,18 +9,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
+import cj1098.animeshare.CustomViews.DotLoader;
 import cj1098.animeshare.CustomViews.SpacesItemDecoration;
+import cj1098.animeshare.R;
+import cj1098.animeshare.ShowsRecyclerAdapter;
 import cj1098.animeshare.service.AnimeRequestService;
 import cj1098.animeshare.userList.AnimeObject;
+import cj1098.animeshare.util.DaggerUtil;
 import cj1098.animeshare.util.NetworkUtil;
 import cj1098.base.BaseFragment;
-import cj1098.event.AnimeObjectReceivedEvent;
 import cj1098.event.NoNetworkEvent;
 import cj1098.event.RxBus;
 import cj1098.event.SlowNetworkEvent;
-import rx.subscriptions.CompositeSubscription;
 
 
 /**
@@ -28,17 +33,20 @@ import rx.subscriptions.CompositeSubscription;
  * Use the {@link AnimeListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AnimeListFragment extends BaseFragment {
+public class AnimeListFragment extends BaseFragment implements AnimeListMvp.View {
     public static final String TAG = AnimeListFragment.class.getName();
 
+    @Inject
+    AnimeListMvp.Presenter animeListPresenter;
+
     private ProgressBar animatedLoader;
+    private DotLoader mDotLoader;
     private RecyclerView mRecyclerView;
     private GridLayoutManager mLayoutManager;
     private RecyclerView.Adapter mAdapter;
     private ArrayList<AnimeObject> animeList = new ArrayList<>();
     private boolean isLoading = false;
     private int endingId = 10;
-    private CompositeSubscription compositeSubscription;
 
     /**
      * Use this factory method to create a new instance of
@@ -57,12 +65,10 @@ public class AnimeListFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (compositeSubscription == null) {
-            compositeSubscription = new CompositeSubscription();
-        }
+        DaggerUtil.getInstance().getApplicationComponent().inject(this);
         if (getArguments() != null) {
         }
-        compositeSubscription.add(RxBus.getInstance().register(AnimeObjectReceivedEvent.class, this::updateMainAnimeList));
+
     }
 
     @Override
@@ -76,7 +82,7 @@ public class AnimeListFragment extends BaseFragment {
         initControls();
         if (NetworkUtil.isConnected(getContext())) {
             AnimeRequestService service = new AnimeRequestService();
-            service.callService(endingId - 9, endingId);
+            service.fetchFullAnimeList();
         }
         return v;
     }
@@ -85,6 +91,15 @@ public class AnimeListFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
+        animeListPresenter.attachView(this);
+        animeListPresenter.subscribeToObservables();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        animeListPresenter.unsubscribeFromObservables();
+        animeListPresenter.detachView();
     }
 
     /**
@@ -120,7 +135,6 @@ public class AnimeListFragment extends BaseFragment {
                 //TODO: or a too slow to operate speed.
                 if (NetworkUtil.isConnected(getContext())) {
                     AnimeRequestService service = new AnimeRequestService();
-                    service.callService(endingId - 9, endingId);
                 }
                 else if (!NetworkUtil.isConnectedFast(getContext())){
                     SlowNetworkEvent slowNetworkEvent = new SlowNetworkEvent();
@@ -137,16 +151,19 @@ public class AnimeListFragment extends BaseFragment {
         }
     }
 
-    private void updateMainAnimeList(AnimeObjectReceivedEvent event) {
-        if (!isDuplicateEntry(event.getAnimeObject())) {
-            animeList.add(event.getAnimeObject());
+    public void updateAnimeList(AnimeObject animeObject) {
+        if (!isDuplicateEntry(animeObject)) {
+            animeList.add(animeObject);
         }
         if (mLayoutManager.getChildCount() == 0) {
             mAdapter = new ShowsRecyclerAdapter(getActivity(), animeList);
             mRecyclerView.setAdapter(mAdapter);
         }
         else {
-            mAdapter.notifyItemInserted(animeList.indexOf(event.getAnimeObject()));
+            mAdapter.notifyItemInserted(animeList.indexOf(animeObject));
+            if (animeList.size() % 10 == 0) {
+                mDotLoader.setVisibility(View.GONE);
+            }
         }
     }
 

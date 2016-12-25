@@ -4,7 +4,7 @@
     android:id="@+id/drawer_layout"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".MainActivity">
+    tools:context=".HomeActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
