@@ -9,7 +9,11 @@ import java.util.List;
 import cj1098.animeshare.exceptions.ViewAlreadyAttachedException;
 import cj1098.animeshare.util.DatabaseUtil;
 import cj1098.animeshare.util.DeviceUtil;
+import cj1098.animeshare.util.XMLUtil;
+import cj1098.animeshare.xmlobjects.Item;
 import cj1098.base.BasePresenter;
+import cj1098.event.InitialDatabaseStorageEventEnded;
+import cj1098.event.InitialDatabaseStorageEventStarted;
 import cj1098.event.InitialXMLParseFinishedEvent;
 import cj1098.event.NoNetworkEvent;
 import cj1098.event.RxBus;
@@ -25,13 +29,17 @@ import static cj1098.base.BaseActivity.TAG;
 public class HomeHeadlessPresenter extends BasePresenter<HomeHeadlessMvp.View> implements
             HomeHeadlessMvp.Presenter {
 
-    private CompositeSubscription compositeSubscription;
-    private DeviceUtil deviceUtil;
-    private DatabaseUtil databaseUtil;
+    private CompositeSubscription mCompositeSubscription;
+    private DeviceUtil mDeviceUtil;
+    private DatabaseUtil mDatabaseUtil;
+    private XMLUtil mXMLUtil;
+    private RxBus mRxBus;
 
-    public HomeHeadlessPresenter(DeviceUtil deviceUtil, DatabaseUtil databaseUtil) {
-        this.deviceUtil = deviceUtil;
-        this.databaseUtil = databaseUtil;
+    public HomeHeadlessPresenter(DeviceUtil deviceUtil, DatabaseUtil databaseUtil, XMLUtil xmlUtil) {
+        mDeviceUtil = deviceUtil;
+        mDatabaseUtil = databaseUtil;
+        mXMLUtil = xmlUtil;
+        mRxBus = RxBus.getInstance();
     }
 
     @Override
@@ -41,19 +49,19 @@ public class HomeHeadlessPresenter extends BasePresenter<HomeHeadlessMvp.View> i
 
     @Override
     public void subscribeToObservables() {
-        if (compositeSubscription == null) {
-            compositeSubscription = new CompositeSubscription();
+        if (mCompositeSubscription == null) {
+            mCompositeSubscription = new CompositeSubscription();
         }
 
-        compositeSubscription.add(RxBus.getInstance().register(NoNetworkEvent.class, this::showNoNetworkDialog));
-        compositeSubscription.add(RxBus.getInstance().register(SlowNetworkEvent.class, this::showSlowNetworkDialog));
-        compositeSubscription.add(RxBus.getInstance().register(InitialXMLParseFinishedEvent.class, this::initialDBPopulation));
+        mCompositeSubscription.add(mRxBus.register(NoNetworkEvent.class, this::showNoNetworkDialog));
+        mCompositeSubscription.add(mRxBus.register(SlowNetworkEvent.class, this::showSlowNetworkDialog));
+        mCompositeSubscription.add(mRxBus.register(InitialXMLParseFinishedEvent.class, this::initialDBPopulation));
     }
 
     @Override
     public void unsubscribeFromObservables() {
-        if (compositeSubscription != null) {
-            compositeSubscription.clear();
+        if (mCompositeSubscription != null) {
+            mCompositeSubscription.clear();
         }
     }
 
@@ -71,6 +79,7 @@ public class HomeHeadlessPresenter extends BasePresenter<HomeHeadlessMvp.View> i
     }
 
     private void initialDBPopulation(InitialXMLParseFinishedEvent initialXMLParseFinishedEvent) {
-        databaseUtil.setupInitialAnimeFetchData(initialXMLParseFinishedEvent.getmAnimeIdList());
+        List<Item> animeIdList = mXMLUtil.parseInitialFullList(initialXMLParseFinishedEvent.getmAnimeIdList());
+        mDatabaseUtil.setupInitialAnimeFetchData(animeIdList);
     }
 }

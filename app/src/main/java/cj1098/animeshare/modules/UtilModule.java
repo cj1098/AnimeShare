@@ -5,6 +5,7 @@ import android.content.Context;
 import javax.inject.Singleton;
 
 import cj1098.animeshare.util.DatabaseUtil;
+import cj1098.animeshare.util.XMLUtil;
 import dagger.Module;
 import dagger.Provides;
 
@@ -16,6 +17,12 @@ import dagger.Provides;
 })
 
 public class UtilModule {
+
+    @Provides
+    @Singleton
+    XMLUtil providesXMLUtil(DatabaseUtil databaseUtil) {
+        return new XMLUtil(databaseUtil);
+    }
 
     @Provides
     @Singleton

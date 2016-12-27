@@ -8,9 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -22,6 +24,7 @@ import cj1098.animeshare.service.AnimeRequestService;
 import cj1098.animeshare.userList.AnimeObject;
 import cj1098.animeshare.util.DaggerUtil;
 import cj1098.animeshare.util.NetworkUtil;
+import cj1098.animeshare.xmlobjects.Anime;
 import cj1098.base.BaseFragment;
 import cj1098.event.NoNetworkEvent;
 import cj1098.event.RxBus;
@@ -37,16 +40,16 @@ public class AnimeListFragment extends BaseFragment implements AnimeListMvp.View
     public static final String TAG = AnimeListFragment.class.getName();
 
     @Inject
-    AnimeListMvp.Presenter animeListPresenter;
+    AnimeListMvp.Presenter mAnimeListPresenter;
 
-    private ProgressBar animatedLoader;
+    private ProgressBar mAnimatedLoader;
     private DotLoader mDotLoader;
     private RecyclerView mRecyclerView;
     private GridLayoutManager mLayoutManager;
     private RecyclerView.Adapter mAdapter;
     private ArrayList<AnimeObject> animeList = new ArrayList<>();
     private boolean isLoading = false;
-    private int endingId = 10;
+    private AnimeRequestService mRequestService;
 
     /**
      * Use this factory method to create a new instance of
@@ -66,6 +69,7 @@ public class AnimeListFragment extends BaseFragment implements AnimeListMvp.View
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         DaggerUtil.getInstance().getApplicationComponent().inject(this);
+        mRequestService = new AnimeRequestService();
         if (getArguments() != null) {
         }
 
@@ -78,11 +82,10 @@ public class AnimeListFragment extends BaseFragment implements AnimeListMvp.View
         View v = inflater.inflate(R.layout.fragment_shows, container, false);
 
         mRecyclerView = (RecyclerView)v.findViewById(R.id.user_gridlist);
-        animatedLoader = (ProgressBar)v.findViewById(R.id.gridview_loader);
+        mAnimatedLoader = (ProgressBar)v.findViewById(R.id.gridview_loader);
         initControls();
         if (NetworkUtil.isConnected(getContext())) {
-            AnimeRequestService service = new AnimeRequestService();
-            service.fetchFullAnimeList();
+            mRequestService.fetchFullAnimeList();
         }
         return v;
     }
@@ -91,22 +94,21 @@ public class AnimeListFragment extends BaseFragment implements AnimeListMvp.View
     @Override
     public void onResume() {
         super.onResume();
-        animeListPresenter.attachView(this);
-        animeListPresenter.subscribeToObservables();
+        mAnimeListPresenter.attachView(this);
+        mAnimeListPresenter.subscribeToObservables();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        animeListPresenter.unsubscribeFromObservables();
-        animeListPresenter.detachView();
+        mAnimeListPresenter.unsubscribeFromObservables();
+        mAnimeListPresenter.detachView();
     }
 
     /**
      * setup the recyclerview and tell it to listen for scroll changes and act accordingly.
      */
     private void initControls() {
-        mAdapter = new ShowsRecyclerAdapter(getActivity(), animeList);
         mLayoutManager = new GridLayoutManager(getActivity(), 3);
         mRecyclerView.addItemDecoration(new SpacesItemDecoration(50));
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -129,7 +131,6 @@ public class AnimeListFragment extends BaseFragment implements AnimeListMvp.View
         if ((mLayoutManager.findFirstVisibleItemPosition() + mLayoutManager.getChildCount()) >= mLayoutManager.getItemCount() - 6) {
             if (!isLoading) {
 
-                endingId += 20;
                 isLoading = true;
                 //TODO: add a connected slow check and then post a slowNetwork event that would display either no network speed
                 //TODO: or a too slow to operate speed.
@@ -150,30 +151,36 @@ public class AnimeListFragment extends BaseFragment implements AnimeListMvp.View
             }
         }
     }
+    // region AnimeListMvp interface methods
 
-    public void updateAnimeList(AnimeObject animeObject) {
-        if (!isDuplicateEntry(animeObject)) {
-            animeList.add(animeObject);
-        }
+    @Override
+    public void updateAnimeList(List<Anime> animeList) {
         if (mLayoutManager.getChildCount() == 0) {
             mAdapter = new ShowsRecyclerAdapter(getActivity(), animeList);
             mRecyclerView.setAdapter(mAdapter);
         }
         else {
-            mAdapter.notifyItemInserted(animeList.indexOf(animeObject));
-            if (animeList.size() % 10 == 0) {
-                mDotLoader.setVisibility(View.GONE);
-            }
+
         }
+
     }
 
-    private boolean isDuplicateEntry(AnimeObject animeObject) {
-        for (int i = 0; i < animeList.size(); i++) {
-            if (animeObject.getId() == animeList.get(i).getId()) {
-                return true;
-            }
-        }
-        return false;
+    @Override
+    public void showInitialDBStorageDialog() {
+        mAnimatedLoader.setVisibility(View.VISIBLE);
     }
+
+    @Override
+    public void dismissInitialDBStorageDialog() {
+        mAnimatedLoader.setVisibility(View.GONE);
+        mAnimeListPresenter.makeBatchCall(mRecyclerView.getLayoutManager().getChildCount());
+    }
+
+    @Override
+    public void makeBatchCallWithIds(String idList) {
+        mRequestService.fetchNextFiftyAnimeObjects(idList);
+    }
+
+    // endregion
 
 }

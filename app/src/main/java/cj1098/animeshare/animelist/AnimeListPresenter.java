@@ -1,8 +1,17 @@
 package cj1098.animeshare.animelist;
 
+import java.util.List;
+
 import cj1098.animeshare.userList.AnimeObject;
+import cj1098.animeshare.util.DatabaseUtil;
+import cj1098.animeshare.util.XMLUtil;
+import cj1098.animeshare.xmlobjects.Anime;
 import cj1098.base.BasePresenter;
 import cj1098.event.AnimeObjectReceivedEvent;
+import cj1098.event.BatchResponseFinishedEvent;
+import cj1098.event.InitialDatabaseStorageEventEnded;
+import cj1098.event.InitialDatabaseStorageEventStarted;
+import cj1098.event.InitialXMLParseFinishedEvent;
 import cj1098.event.RxBus;
 import rx.subscriptions.CompositeSubscription;
 
@@ -12,29 +21,60 @@ import rx.subscriptions.CompositeSubscription;
 
 public class AnimeListPresenter extends BasePresenter<AnimeListMvp.View> implements AnimeListMvp.Presenter{
 
-    private CompositeSubscription compositeSubscription;
+    private CompositeSubscription mCompositeSubscription;
+    private RxBus mRxBus;
+    private DatabaseUtil mDatabaseUtil;
+    private XMLUtil mXMLUtil;
 
-    public AnimeListPresenter() {
+    public AnimeListPresenter(DatabaseUtil databaseUtil, XMLUtil xmlUtil) {
+        mRxBus = RxBus.getInstance();
+        mDatabaseUtil = databaseUtil;
+        mXMLUtil = xmlUtil;
     }
 
     @Override
     public void subscribeToObservables() {
-        if (compositeSubscription == null) {
-            compositeSubscription = new CompositeSubscription();
+        if (mCompositeSubscription == null) {
+            mCompositeSubscription = new CompositeSubscription();
         }
-        compositeSubscription.add(RxBus.getInstance().register(AnimeObjectReceivedEvent.class, this::updateAnimeList));
+        mCompositeSubscription.add(mRxBus.register(InitialXMLParseFinishedEvent.class, e -> initialDBStorageEventStarted()));
+        mCompositeSubscription.add(mRxBus.register(InitialDatabaseStorageEventEnded.class, e -> initialDBStorageEventEnded()));
+        mCompositeSubscription.add(mRxBus.register(BatchResponseFinishedEvent.class, this::updateAnimeList));
     }
 
     @Override
     public void unsubscribeFromObservables() {
-        if (compositeSubscription != null) {
-            compositeSubscription.clear();
+        if (mCompositeSubscription != null) {
+            mCompositeSubscription.clear();
         }
     }
 
-    private void updateAnimeList(AnimeObjectReceivedEvent animeObjectReceivedEvent) {
+    // region AnimeListMvp presenter interface methods
+    @Override
+    public void makeBatchCall(int startingId) {
         if (isAttached()) {
-            getView().updateAnimeList(animeObjectReceivedEvent.getAnimeObject());
+            getView().makeBatchCallWithIds(mDatabaseUtil.getNextFiftyIds(startingId));
+        }
+    }
+
+    // endregion
+
+    private void updateAnimeList(BatchResponseFinishedEvent responseFinishedEvent) {
+        if (isAttached()) {
+            List<Anime> animeList = mXMLUtil.parseFiftyAnimeEntries(responseFinishedEvent.getAnimeList());
+            getView().updateAnimeList(animeList);
+        }
+    }
+
+    private void initialDBStorageEventStarted() {
+        if (isAttached()) {
+            getView().showInitialDBStorageDialog();
+        }
+    }
+
+    private void initialDBStorageEventEnded() {
+        if (isAttached()) {
+            getView().dismissInitialDBStorageDialog();
         }
     }
 }

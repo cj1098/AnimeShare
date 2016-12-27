@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:anime="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -9,28 +9,19 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/user_gridlist"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight=".90"
+        android:layout_height="match_parent"
         android:scrollbarDefaultDelayBeforeFade="1000"
         android:scrollbars="vertical"
         android:stretchMode="none"
         />
 
     <ProgressBar
-        android:id="@+id/api_load_progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:progressTint="@android:color/holo_green_dark"
-        style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"/>
-
-
-    <ProgressBar
         android:id="@+id/gridview_loader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/Green"
         android:indeterminate="true"
-        android:layout_gravity="bottom|center_horizontal"
+        android:layout_centerInParent="true"
         android:visibility="gone"/>
 
-</LinearLayout>
+</RelativeLayout>

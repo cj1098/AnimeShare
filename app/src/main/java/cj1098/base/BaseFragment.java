@@ -14,7 +14,7 @@ import android.support.v4.app.Fragment;
 @UiThread
 public class BaseFragment extends Fragment {
 
-    BaseDialogFragment baseDialogFragment;
+    public BaseDialogFragment mBaseDialogFragment;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

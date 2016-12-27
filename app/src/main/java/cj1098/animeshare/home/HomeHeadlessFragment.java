@@ -2,6 +2,8 @@ package cj1098.animeshare.home;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StyleRes;
+import android.support.v4.app.DialogFragment;
 import android.widget.Toast;
 
 import javax.inject.Inject;

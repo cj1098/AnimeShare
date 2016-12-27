@@ -20,18 +20,20 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import cj1098.animeshare.userList.AnimeObject;
+import cj1098.animeshare.xmlobjects.Anime;
 
 public class ShowsRecyclerAdapter extends RecyclerView.Adapter<ShowsRecyclerAdapter.ShowsViewHolder> {
     private Context mContext;
-    private ArrayList<AnimeObject> mShowObjects;
+    private List<Anime> mAnimeObjects;
 
-    public ShowsRecyclerAdapter(Context context, ArrayList<AnimeObject> data) {
+    public ShowsRecyclerAdapter(Context context, List<Anime> data) {
         this.mContext = context;
-        this.mShowObjects = data;
+        this.mAnimeObjects = data;
     }
 
     public static class ShowsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -64,9 +66,10 @@ public class ShowsRecyclerAdapter extends RecyclerView.Adapter<ShowsRecyclerAdap
     @Override
     public void onBindViewHolder(final ShowsViewHolder holder, final int position) {
         Glide.with(mContext)
-                .load(mShowObjects.get(position).getCover_image())
+                .load(mAnimeObjects.get(position).getInfoList().get(0).getThumbnailImageSrc())
                 .asBitmap()
-                .error(R.drawable.code_geass)
+                .placeholder(R.drawable.logo)
+                .error(R.drawable.logo)
                 .into(new SimpleTarget<Bitmap>() {
                     @Override
                     public void onLoadStarted(Drawable placeholder) {
@@ -87,20 +90,23 @@ public class ShowsRecyclerAdapter extends RecyclerView.Adapter<ShowsRecyclerAdap
                         holder.image.setImageDrawable(errorDrawable);
                     }
                 });
-        holder.title.setText(mShowObjects.get(position).getTitle());
-        holder.rb.setRating(mShowObjects.get(position).getCommunity_rating());
+        holder.title.setText(mAnimeObjects.get(position).getName());
+        if (mAnimeObjects.get(position).getRatings() != null) {
+            holder.rb.setRating(Float.parseFloat(mAnimeObjects.get(position).getRatings().getWeightedScore()));
+        }
+
 
         holder.itemView.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-            builder.setTitle(mShowObjects.get(position).getTitle())
-                    .setMessage(mShowObjects.get(position).getSynopsis())
+            builder.setTitle(mAnimeObjects.get(position).getName())
+                    .setMessage(mAnimeObjects.get(position).getInfoList().get(2).getText())
                     .show();
         });
     }
 
     @Override
     public int getItemCount() {
-        return mShowObjects.size();
+        return mAnimeObjects.size();
     }
 
 }
