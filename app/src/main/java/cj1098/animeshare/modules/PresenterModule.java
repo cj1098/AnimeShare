@@ -4,9 +4,10 @@ import cj1098.animeshare.animelist.AnimeListMvp;
 import cj1098.animeshare.animelist.AnimeListPresenter;
 import cj1098.animeshare.home.HomeHeadlessMvp;
 import cj1098.animeshare.home.HomeHeadlessPresenter;
+import cj1098.animeshare.service.AnimeRequestService;
 import cj1098.animeshare.util.DatabaseUtil;
 import cj1098.animeshare.util.DeviceUtil;
-import cj1098.animeshare.util.XMLUtil;
+import cj1098.animeshare.util.Preferences;
 import dagger.Module;
 import dagger.Provides;
 
@@ -16,17 +17,19 @@ import dagger.Provides;
 
 @Module (includes = {
         DeviceModule.class,
-        UtilModule.class
+        UtilModule.class,
+        PreferencesModule.class,
+        ServiceModule.class
 })
 public class PresenterModule {
 
     @Provides
-    HomeHeadlessMvp.Presenter providesHomeHeadlessPresenter(DeviceUtil deviceUtil, DatabaseUtil databaseUtil, XMLUtil xmlUtil) {
-        return new HomeHeadlessPresenter(deviceUtil, databaseUtil, xmlUtil);
+    HomeHeadlessMvp.Presenter providesHomeHeadlessPresenter(DeviceUtil deviceUtil, DatabaseUtil databaseUtil) {
+        return new HomeHeadlessPresenter(deviceUtil, databaseUtil);
    }
 
     @Provides
-    AnimeListMvp.Presenter providesAnimeListPresenter(DatabaseUtil databaseUtil, XMLUtil xmlUtil) {
-        return new AnimeListPresenter(databaseUtil, xmlUtil);
+    AnimeListMvp.Presenter providesAnimeListPresenter(DatabaseUtil databaseUtil, Preferences preferences, AnimeRequestService requestService) {
+        return new AnimeListPresenter(databaseUtil, preferences, requestService);
     }
 }

@@ -2,18 +2,16 @@ package cj1098.animeshare.util;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Singleton;
 
 import cj1098.animeshare.database.AnimeShareDBContract;
-import cj1098.animeshare.xmlobjects.Item;
+import cj1098.animeshare.userList.AnimeObject;
 import cj1098.event.InitialDatabaseStorageEventEnded;
 import cj1098.event.RxBus;
 
@@ -49,12 +47,12 @@ public class DatabaseUtil extends SQLiteOpenHelper{
 
     }
 
-    public void setupInitialAnimeFetchData(List<Item> mIdList) {
+    public void setupInitialAnimeFetchData(List<AnimeObject> mIdList) {
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
         ContentValues values = new ContentValues();
         for (int i = 0, n = mIdList.size(); i < n; i++) {
-            values.put(AnimeShareDBContract.AnimeShareEntry.COLUMN_NAME_TITLE, mIdList.get(i).getName());
+            values.put(AnimeShareDBContract.AnimeShareEntry.COLUMN_NAME_TITLE, mIdList.get(i).getTitleEnglish());
             values.put(AnimeShareDBContract.AnimeShareEntry.COLUMN_NAME_ID, mIdList.get(i).getId());
             db.insert(AnimeShareDBContract.AnimeShareEntry.TABLE_NAME, null, values);
         }

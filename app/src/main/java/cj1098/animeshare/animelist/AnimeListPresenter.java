@@ -1,17 +1,12 @@
 package cj1098.animeshare.animelist;
 
-import java.util.List;
-
-import cj1098.animeshare.userList.AnimeObject;
+import cj1098.animeshare.service.AnimeRequestService;
 import cj1098.animeshare.util.DatabaseUtil;
-import cj1098.animeshare.util.XMLUtil;
-import cj1098.animeshare.xmlobjects.Anime;
+import cj1098.animeshare.util.Preferences;
 import cj1098.base.BasePresenter;
-import cj1098.event.AnimeObjectReceivedEvent;
+import cj1098.event.AccessTokenRetrievedEvent;
 import cj1098.event.BatchResponseFinishedEvent;
 import cj1098.event.InitialDatabaseStorageEventEnded;
-import cj1098.event.InitialDatabaseStorageEventStarted;
-import cj1098.event.InitialXMLParseFinishedEvent;
 import cj1098.event.RxBus;
 import rx.subscriptions.CompositeSubscription;
 
@@ -24,12 +19,14 @@ public class AnimeListPresenter extends BasePresenter<AnimeListMvp.View> impleme
     private CompositeSubscription mCompositeSubscription;
     private RxBus mRxBus;
     private DatabaseUtil mDatabaseUtil;
-    private XMLUtil mXMLUtil;
+    private Preferences mPreferences;
+    private AnimeRequestService mService;
 
-    public AnimeListPresenter(DatabaseUtil databaseUtil, XMLUtil xmlUtil) {
+    public AnimeListPresenter(DatabaseUtil databaseUtil, Preferences preferences, AnimeRequestService service) {
         mRxBus = RxBus.getInstance();
         mDatabaseUtil = databaseUtil;
-        mXMLUtil = xmlUtil;
+        mPreferences = preferences;
+        mService = service;
     }
 
     @Override
@@ -37,9 +34,8 @@ public class AnimeListPresenter extends BasePresenter<AnimeListMvp.View> impleme
         if (mCompositeSubscription == null) {
             mCompositeSubscription = new CompositeSubscription();
         }
-        mCompositeSubscription.add(mRxBus.register(InitialXMLParseFinishedEvent.class, e -> initialDBStorageEventStarted()));
-        mCompositeSubscription.add(mRxBus.register(InitialDatabaseStorageEventEnded.class, e -> initialDBStorageEventEnded()));
         mCompositeSubscription.add(mRxBus.register(BatchResponseFinishedEvent.class, this::updateAnimeList));
+        mCompositeSubscription.add(mRxBus.register(AccessTokenRetrievedEvent.class, this::storeAccessToken));
     }
 
     @Override
@@ -51,30 +47,26 @@ public class AnimeListPresenter extends BasePresenter<AnimeListMvp.View> impleme
 
     // region AnimeListMvp presenter interface methods
     @Override
-    public void makeBatchCall(int startingId) {
+    public void makeBatchCall(String page) {
         if (isAttached()) {
-            getView().makeBatchCallWithIds(mDatabaseUtil.getNextFiftyIds(startingId));
+            mService.getAnimeBatch(mPreferences.getAccessToken(), page);
         }
+    }
+
+    @Override
+    public void makeAuthRequest() {
+        mService.getAccessTokenAndMakeFirstBatchRequest();
     }
 
     // endregion
 
+    private void storeAccessToken(AccessTokenRetrievedEvent accessTokenReceivedEvent) {
+        mPreferences.setAccessToken(accessTokenReceivedEvent.getAccessToken());
+    }
+
     private void updateAnimeList(BatchResponseFinishedEvent responseFinishedEvent) {
         if (isAttached()) {
-            List<Anime> animeList = mXMLUtil.parseFiftyAnimeEntries(responseFinishedEvent.getAnimeList());
-            getView().updateAnimeList(animeList);
-        }
-    }
-
-    private void initialDBStorageEventStarted() {
-        if (isAttached()) {
-            getView().showInitialDBStorageDialog();
-        }
-    }
-
-    private void initialDBStorageEventEnded() {
-        if (isAttached()) {
-            getView().dismissInitialDBStorageDialog();
+            getView().updateAnimeList(responseFinishedEvent.getAnimeList());
         }
     }
 }

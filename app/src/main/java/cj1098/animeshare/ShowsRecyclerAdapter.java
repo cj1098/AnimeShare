@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.media.Rating;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,19 +18,18 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import cj1098.animeshare.userList.AnimeObject;
-import cj1098.animeshare.xmlobjects.Anime;
 
 public class ShowsRecyclerAdapter extends RecyclerView.Adapter<ShowsRecyclerAdapter.ShowsViewHolder> {
     private Context mContext;
-    private List<Anime> mAnimeObjects;
+    private List<AnimeObject> mAnimeObjects;
+    private static final int MAX_RATING = 100;
 
-    public ShowsRecyclerAdapter(Context context, List<Anime> data) {
+    public ShowsRecyclerAdapter(Context context, List<AnimeObject> data) {
         this.mContext = context;
         this.mAnimeObjects = data;
     }
@@ -66,10 +64,9 @@ public class ShowsRecyclerAdapter extends RecyclerView.Adapter<ShowsRecyclerAdap
     @Override
     public void onBindViewHolder(final ShowsViewHolder holder, final int position) {
         Glide.with(mContext)
-                .load(mAnimeObjects.get(position).getInfoList().get(0).getThumbnailImageSrc())
+                .load(mAnimeObjects.get(position).getImageUrlLge())
                 .asBitmap()
-                .placeholder(R.drawable.logo)
-                .error(R.drawable.logo)
+                .error(R.drawable.code_geass)
                 .into(new SimpleTarget<Bitmap>() {
                     @Override
                     public void onLoadStarted(Drawable placeholder) {
@@ -90,20 +87,27 @@ public class ShowsRecyclerAdapter extends RecyclerView.Adapter<ShowsRecyclerAdap
                         holder.image.setImageDrawable(errorDrawable);
                     }
                 });
-        holder.title.setText(mAnimeObjects.get(position).getName());
-        if (mAnimeObjects.get(position).getRatings() != null) {
-            holder.rb.setRating(Float.parseFloat(mAnimeObjects.get(position).getRatings().getWeightedScore()));
+        holder.title.setText(mAnimeObjects.get(position).getTitleEnglish());
+        if (mAnimeObjects.get(position).getAverageScore() != null) {
+            holder.rb.setMax(MAX_RATING);
+            holder.rb.setRating(mAnimeObjects.get(position).getAverageScore().floatValue() / 200f * 10f);
         }
 
 
         holder.itemView.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-            builder.setTitle(mAnimeObjects.get(position).getName())
-                    .setMessage(mAnimeObjects.get(position).getInfoList().get(2).getText())
+            builder.setTitle(mAnimeObjects.get(position).getTitleEnglish())
+                    .setMessage(mAnimeObjects.get(position).getAverageScore().toString())
                     .show();
         });
     }
 
+    public void addBatchResponseToList(List<AnimeObject> newAnimeObjects) {
+        if (newAnimeObjects.size() > 0) {
+            mAnimeObjects.addAll(newAnimeObjects);
+            notifyItemRangeInserted(mAnimeObjects.size() - newAnimeObjects.size(), mAnimeObjects.size());
+        }
+    }
     @Override
     public int getItemCount() {
         return mAnimeObjects.size();

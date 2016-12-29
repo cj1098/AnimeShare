@@ -3,7 +3,9 @@ package cj1098.animeshare.util;
 import cj1098.animeshare.modules.ApplicationComponent;
 import cj1098.animeshare.modules.ContextModule;
 import cj1098.animeshare.modules.DaggerApplicationComponent_MainApplicationComponent;
+import cj1098.animeshare.modules.PreferencesModule;
 import cj1098.animeshare.modules.PresenterModule;
+import cj1098.animeshare.modules.ServiceModule;
 import cj1098.animeshare.modules.UtilModule;
 import cj1098.base.BaseApplication;
 
@@ -25,6 +27,8 @@ public class DaggerUtil {
             mApplicationComponent = DaggerApplicationComponent_MainApplicationComponent.builder()
                     .utilModule(new UtilModule())
                     .contextModule(contextModule)
+                    .serviceModule(new ServiceModule())
+                    .preferencesModule(new PreferencesModule())
                     .presenterModule(new PresenterModule())
                     .build();
         }

@@ -5,8 +5,8 @@
 
     <ImageView
         android:id="@+id/anime_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_width="90dp"
+        android:layout_height="120dp"/>
     <ProgressBar
         android:id="@+id/image_loader"
         android:layout_width="56dp"

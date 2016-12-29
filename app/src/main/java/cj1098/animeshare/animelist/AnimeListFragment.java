@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 
 import java.util.ArrayList;
@@ -24,7 +23,6 @@ import cj1098.animeshare.service.AnimeRequestService;
 import cj1098.animeshare.userList.AnimeObject;
 import cj1098.animeshare.util.DaggerUtil;
 import cj1098.animeshare.util.NetworkUtil;
-import cj1098.animeshare.xmlobjects.Anime;
 import cj1098.base.BaseFragment;
 import cj1098.event.NoNetworkEvent;
 import cj1098.event.RxBus;
@@ -46,10 +44,8 @@ public class AnimeListFragment extends BaseFragment implements AnimeListMvp.View
     private DotLoader mDotLoader;
     private RecyclerView mRecyclerView;
     private GridLayoutManager mLayoutManager;
-    private RecyclerView.Adapter mAdapter;
-    private ArrayList<AnimeObject> animeList = new ArrayList<>();
+    private ShowsRecyclerAdapter mAdapter;
     private boolean isLoading = false;
-    private AnimeRequestService mRequestService;
 
     /**
      * Use this factory method to create a new instance of
@@ -69,10 +65,6 @@ public class AnimeListFragment extends BaseFragment implements AnimeListMvp.View
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         DaggerUtil.getInstance().getApplicationComponent().inject(this);
-        mRequestService = new AnimeRequestService();
-        if (getArguments() != null) {
-        }
-
     }
 
     @Override
@@ -85,7 +77,7 @@ public class AnimeListFragment extends BaseFragment implements AnimeListMvp.View
         mAnimatedLoader = (ProgressBar)v.findViewById(R.id.gridview_loader);
         initControls();
         if (NetworkUtil.isConnected(getContext())) {
-            mRequestService.fetchFullAnimeList();
+            mAnimeListPresenter.makeAuthRequest();
         }
         return v;
     }
@@ -126,16 +118,19 @@ public class AnimeListFragment extends BaseFragment implements AnimeListMvp.View
     /**
      * I'll try my best to explain this. This checks if the user has finished their scroll "action"
      * it makes sure the scroll state is idle and check if you're currently loading data.
+     * TODO: check for flings as well and do the same thing.
      */
     private void isScrollCompleted() {
-        if ((mLayoutManager.findFirstVisibleItemPosition() + mLayoutManager.getChildCount()) >= mLayoutManager.getItemCount() - 6) {
+        if ((mLayoutManager.findFirstVisibleItemPosition() + mLayoutManager.getChildCount()) >= mLayoutManager.getItemCount() - 3) {
             if (!isLoading) {
 
                 isLoading = true;
                 //TODO: add a connected slow check and then post a slowNetwork event that would display either no network speed
                 //TODO: or a too slow to operate speed.
                 if (NetworkUtil.isConnected(getContext())) {
-                    AnimeRequestService service = new AnimeRequestService();
+                    // TODO: presenter should make the call here and everywhere in this class.
+                    mAnimeListPresenter.makeBatchCall(Integer.toString(mLayoutManager.getItemCount() / 40) + 1);
+                    //mRequestService.getAnimeBatch("1ndqqBfOCq9FpXTKsPB5NE4JR8Fp5iQy6kctMfnK", Integer.toString(mLayoutManager.getItemCount() / 40) + 1);
                 }
                 else if (!NetworkUtil.isConnectedFast(getContext())){
                     SlowNetworkEvent slowNetworkEvent = new SlowNetworkEvent();
@@ -154,31 +149,14 @@ public class AnimeListFragment extends BaseFragment implements AnimeListMvp.View
     // region AnimeListMvp interface methods
 
     @Override
-    public void updateAnimeList(List<Anime> animeList) {
-        if (mLayoutManager.getChildCount() == 0) {
+    public void updateAnimeList(List<AnimeObject> animeList) {
+        if (mLayoutManager.getItemCount() == 0) {
             mAdapter = new ShowsRecyclerAdapter(getActivity(), animeList);
             mRecyclerView.setAdapter(mAdapter);
         }
         else {
-
+            mAdapter.addBatchResponseToList(animeList);
         }
-
-    }
-
-    @Override
-    public void showInitialDBStorageDialog() {
-        mAnimatedLoader.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void dismissInitialDBStorageDialog() {
-        mAnimatedLoader.setVisibility(View.GONE);
-        mAnimeListPresenter.makeBatchCall(mRecyclerView.getLayoutManager().getChildCount());
-    }
-
-    @Override
-    public void makeBatchCallWithIds(String idList) {
-        mRequestService.fetchNextFiftyAnimeObjects(idList);
     }
 
     // endregion
