@@ -1,5 +1,7 @@
 package cj1098.animeshare.animelist;
 
+import java.util.concurrent.TimeUnit;
+
 import cj1098.animeshare.service.AnimeRequestService;
 import cj1098.animeshare.util.DatabaseUtil;
 import cj1098.animeshare.util.Preferences;
@@ -42,20 +44,25 @@ public class AnimeListPresenter extends BasePresenter<AnimeListMvp.View> impleme
     public void unsubscribeFromObservables() {
         if (mCompositeSubscription != null) {
             mCompositeSubscription.clear();
+            mCompositeSubscription = null;
         }
     }
 
     // region AnimeListMvp presenter interface methods
     @Override
     public void makeBatchCall(String page) {
-        if (isAttached()) {
+        if (isAttached() && System.currentTimeMillis() < mPreferences.getmAccessTokenExpireTime()) {
             mService.getAnimeBatch(mPreferences.getAccessToken(), page);
+            mPreferences.setmAccessTokenExpireTime(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(1));
+        }
+        else {
+            mService.getAccessTokenAndMakeBatchRequest(page);
         }
     }
 
     @Override
     public void makeAuthRequest() {
-        mService.getAccessTokenAndMakeFirstBatchRequest();
+        mService.getAccessTokenAndMakeBatchRequest("1");
     }
 
     // endregion

@@ -3,6 +3,7 @@ package cj1098.animeshare.animelist;
 import java.util.List;
 
 import cj1098.animeshare.userList.AnimeObject;
+import cj1098.animeshare.userList.SmallAnimeObject;
 import cj1098.base.BaseMvp;
 import cj1098.base.BaseView;
 
@@ -12,7 +13,7 @@ import cj1098.base.BaseView;
 
 public interface AnimeListMvp extends BaseMvp {
     interface View extends BaseView {
-        void updateAnimeList(List<AnimeObject> animeList);
+        void updateAnimeList(List<SmallAnimeObject> animeList);
 
     }
 

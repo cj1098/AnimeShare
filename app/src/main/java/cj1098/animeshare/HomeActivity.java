@@ -1,23 +1,39 @@
 package cj1098.animeshare;
 
+import android.app.Activity;
+import android.app.ActivityOptions;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.transition.Slide;
+import android.transition.Transition;
 import android.util.Log;
+import android.util.Pair;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,8 +47,12 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
+import cj1098.search.SearchActivity;
 import cj1098.animeshare.animelist.AnimeListFragment;
 import cj1098.animeshare.home.HomeHeadlessFragment;
 import cj1098.animeshare.service.UserInformationService;
@@ -76,6 +96,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
             animeListFragment =  (AnimeListFragment)getSupportFragmentManager().findFragmentByTag(AnimeListFragment.TAG);
         }
 
+        setupWindowAnimations();
         setUpToolbar();
         setUpNavDrawer();
     }
@@ -88,6 +109,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     protected void onResume() {
         super.onResume();
+
     }
 
     @Override
@@ -104,6 +126,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
         super.onCreateOptionsMenu(menu);
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
         return true;
     }
 
@@ -174,6 +197,22 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
         return super.onOptionsItemSelected(item);
     }
 
+    // This is tied to menu/menu_main.xml's search
+    public void startSearchActivity(MenuItem view) {
+        Intent searchActivity = new Intent(this, SearchActivity.class);
+        ActivityOptionsCompat transitionActivityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(HomeActivity.this, null);
+        startActivity(searchActivity, transitionActivityOptions.toBundle());
+    }
+
+    private void setupWindowAnimations() {
+        Transition slide = new Slide();
+        slide.setDuration(1000);
+        ((Slide)slide).setSlideEdge(Gravity.LEFT);
+        getWindow().setEnterTransition(slide);
+        getWindow().setReenterTransition(slide);
+        getWindow().setExitTransition(slide);
+    }
+
 
     private void setUpToolbar() {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -184,6 +223,8 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
         if (mToolbar != null) {
             mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
             mNavView = (NavigationView) findViewById(R.id.main_nav);
+
+            ImageView userProfile = (ImageView)mNavView.getHeaderView(0).findViewById(R.id.user_profile_picture);
 
             mDrawerToggle = new ActionBarDrawerToggle(
                     this,                  /* host Activity */
@@ -204,6 +245,15 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
                     invalidateOptionsMenu();
                 }
             };
+            Glide.with(this).load("https://i.kinja-img.com/gawker-media/image/upload/s--ETNF4Owa--/c_scale,fl_progressive,q_80,w_800/tokxz0mcrvor7jcvlui2.jpg")
+                    .asBitmap().centerCrop().into(new BitmapImageViewTarget(userProfile) {
+                                                      @Override
+                                                      protected void setResource(Bitmap resource) {
+                                                          RoundedBitmapDrawable circularBitmapDrawalbe = RoundedBitmapDrawableFactory.create(getResources(), resource);
+                                                          circularBitmapDrawalbe.setCircular(true);
+                                                          userProfile.setImageDrawable(circularBitmapDrawalbe);
+                                                      }
+                                                  });
             mNavView.setNavigationItemSelectedListener(this);
             mDrawerLayout.addDrawerListener(mDrawerToggle);
             mToolbar.setNavigationOnClickListener(v -> mDrawerLayout.openDrawer(GravityCompat.START));

@@ -11,6 +11,8 @@ import android.support.annotation.VisibleForTesting;
 import android.util.Base64;
 import android.util.Log;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.inject.Singleton;
 
 
@@ -23,13 +25,15 @@ public class Preferences implements SharedPreferences.OnSharedPreferenceChangeLi
     private static final String ACCESS_TOKEN = "ACCESS_TOKEN";
     private static final String USER_ID = "USER_ID";
     private static final String FIRST_TIME_LOGIN = "FIRST_TIME_LOGIN";
+    private static final String ACCESS_TOKEN_EXPIRE_TIME = "ACCESS_TOKEN_EXPIRE_TIME";
     /* Database keys:
          * Used for tests: the array contents must match the public database key Strings
          */
     public static final String[] PREFERENCE_KEYS = {
             Preferences.ACCESS_TOKEN,
             Preferences.USER_ID,
-            Preferences.FIRST_TIME_LOGIN
+            Preferences.FIRST_TIME_LOGIN,
+            Preferences.ACCESS_TOKEN_EXPIRE_TIME
     };
 
     private SharedPreferences mSharedPreferences;
@@ -38,6 +42,7 @@ public class Preferences implements SharedPreferences.OnSharedPreferenceChangeLi
     private String mAccessToken;
     private String mUserId;
     private boolean mFirstTimeLogin;
+    private long mAccessTokenExpireTime;
 
 
     private String mMobileCarrier;
@@ -54,6 +59,7 @@ public class Preferences implements SharedPreferences.OnSharedPreferenceChangeLi
         mAccessToken = getSharedPreferences().getString(ACCESS_TOKEN, "");
         mUserId = getSharedPreferences().getString(USER_ID, "");
         mFirstTimeLogin = getSharedPreferences().getBoolean(FIRST_TIME_LOGIN, false);
+        mAccessTokenExpireTime = getSharedPreferences().getLong(ACCESS_TOKEN_EXPIRE_TIME, System.currentTimeMillis() + TimeUnit.HOURS.toMillis(1));
         //mMobileCarrier = getSharedPreferences().getString(MOBILE_CARRIER, null);
     }
 
@@ -68,6 +74,10 @@ public class Preferences implements SharedPreferences.OnSharedPreferenceChangeLi
                 break;
             case FIRST_TIME_LOGIN:
                 mFirstTimeLogin = getSharedPreferences().getBoolean(FIRST_TIME_LOGIN, false);
+                break;
+            case ACCESS_TOKEN_EXPIRE_TIME:
+                mAccessTokenExpireTime = getSharedPreferences().getLong(ACCESS_TOKEN_EXPIRE_TIME, System.currentTimeMillis() + TimeUnit.HOURS.toMillis(1));
+                break;
             default:
                 Log.e(TAG,  "There is no preference associated with the key: " + key);
                 break;
@@ -119,6 +129,16 @@ public class Preferences implements SharedPreferences.OnSharedPreferenceChangeLi
         Editor editor = getSharedPreferences().edit();
         editor.putString(ACCESS_TOKEN, accessToken);
         editor.apply();
+    }
+
+    public void setmAccessTokenExpireTime(long accessTokenExpireTime) {
+        Editor editor = getSharedPreferences().edit();
+        editor.putLong(ACCESS_TOKEN_EXPIRE_TIME, accessTokenExpireTime);
+        editor.apply();
+    }
+
+    public long getmAccessTokenExpireTime() {
+        return mAccessTokenExpireTime;
     }
 
     public String getAccessToken() {

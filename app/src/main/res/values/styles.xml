@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <!-- Base application theme. -->
@@ -5,8 +6,8 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/MediumBlue</item>
         <item name="colorPrimaryDark">@color/DarkBlue</item>
-    </style>
 
+    </style>
 
     <style name="drawer_text" parent="@android:style/TextAppearance.Medium">
         <item name="android:layout_width">fill_parent</item>

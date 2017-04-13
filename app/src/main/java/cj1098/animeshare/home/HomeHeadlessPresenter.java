@@ -2,10 +2,7 @@ package cj1098.animeshare.home;
 
 import android.support.annotation.NonNull;
 
-import java.util.List;
-
 import cj1098.animeshare.exceptions.ViewAlreadyAttachedException;
-import cj1098.animeshare.userList.AnimeObject;
 import cj1098.animeshare.util.DatabaseUtil;
 import cj1098.animeshare.util.DeviceUtil;
 import cj1098.base.BasePresenter;

@@ -1,12 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:orientation="vertical">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/anime_image"
-        android:layout_width="90dp"
-        android:layout_height="120dp"/>
+    <android.support.v7.widget.CardView
+        android:id="@+id/anime_card_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/anime_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:src="@drawable/code_geass"
+                />
+            <TextView
+                android:id="@+id/anime_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:layout_below="@id/anime_image"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/anime_episode_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/anime_title"
+                android:textSize="8sp"
+                android:textStyle="italic"
+                />
+            <RatingBar
+                android:id="@+id/anime_rating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:numStars="5"
+                style="?android:attr/ratingBarStyleSmall"
+                android:layout_below="@id/anime_episode_count"
+                tools:rating="4"/>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
     <ProgressBar
         android:id="@+id/image_loader"
         android:layout_width="56dp"
@@ -14,22 +54,4 @@
         android:indeterminate="true"
         android:layout_centerInParent="true"
         />
-    <TextView
-        android:id="@+id/anime_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/anime_image"/>
-    <TextView
-        android:id="@+id/anime_description"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-    <RatingBar
-        android:id="@+id/anime_rating"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:numStars="5"
-        style="?android:attr/ratingBarStyleSmall"
-        android:layout_below="@id/anime_title"/>
-
-
 </RelativeLayout>

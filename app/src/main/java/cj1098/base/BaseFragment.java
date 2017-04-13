@@ -6,6 +6,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
+import android.view.View;
+
+import butterknife.ButterKnife;
 
 /**
  * Created by chris on 11/18/16.
@@ -21,6 +24,12 @@ public class BaseFragment extends Fragment {
         super.onCreate(savedInstanceState);
         // All fragments that extend from this one will not be destroyed on rotation.
         setRetainInstance(true);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        ButterKnife.bind(this, view);
     }
 
     /**

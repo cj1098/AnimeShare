@@ -1,6 +1,6 @@
 package cj1098.event;
 
-import cj1098.animeshare.userList.AnimeObject;
+import cj1098.animeshare.userList.SmallAnimeObject;
 
 /**
  * Created by chris on 11/18/16.
@@ -8,14 +8,14 @@ import cj1098.animeshare.userList.AnimeObject;
 
 public class AnimeObjectReceivedEvent extends BaseEvent {
 
-    AnimeObject animeObject;
+    SmallAnimeObject smallAnimeObject;
 
-    public AnimeObjectReceivedEvent(AnimeObject animeObject) {
-        this.animeObject = animeObject;
+    public AnimeObjectReceivedEvent(SmallAnimeObject smallAnimeObject) {
+        this.smallAnimeObject = smallAnimeObject;
     }
 
-    public AnimeObject getAnimeObject() {
-        return animeObject;
+    public SmallAnimeObject getSmallAnimeObject() {
+        return smallAnimeObject;
     }
 
 }

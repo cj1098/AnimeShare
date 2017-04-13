@@ -11,7 +11,7 @@ import java.util.List;
 import javax.inject.Singleton;
 
 import cj1098.animeshare.database.AnimeShareDBContract;
-import cj1098.animeshare.userList.AnimeObject;
+import cj1098.animeshare.userList.SmallAnimeObject;
 import cj1098.event.InitialDatabaseStorageEventEnded;
 import cj1098.event.RxBus;
 
@@ -47,7 +47,7 @@ public class DatabaseUtil extends SQLiteOpenHelper{
 
     }
 
-    public void setupInitialAnimeFetchData(List<AnimeObject> mIdList) {
+    public void setupInitialAnimeFetchData(List<SmallAnimeObject> mIdList) {
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
         ContentValues values = new ContentValues();

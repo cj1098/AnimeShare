@@ -1,6 +1,6 @@
 package cj1098.animeshare.network;
 
-import cj1098.animeshare.userList.AnimeObject;
+import cj1098.animeshare.userList.SmallAnimeObject;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
@@ -11,5 +11,5 @@ import retrofit2.http.Path;
 
 public interface NetworkCommand {
     @GET("/anime/{id}")
-    Call<AnimeObject> callAnimeById(@Path("id") int id);
+    Call<SmallAnimeObject> callAnimeById(@Path("id") int id);
 }

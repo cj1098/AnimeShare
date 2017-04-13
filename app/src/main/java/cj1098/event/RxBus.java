@@ -60,7 +60,7 @@ public class RxBus {
     }
 
     public void clear() {
-        //mBusSubject.onNext(new NullEvent());
+        mBusSubject.onNext(new NullEvent());
     }
 
     @VisibleForTesting

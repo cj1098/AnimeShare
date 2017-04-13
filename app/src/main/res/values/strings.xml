@@ -24,5 +24,14 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_example">Example action</string>
+    <string name="search_hint">Cowboy Bebop</string>
+    <string name="search_label">Search</string>
+
+    <string name="anime_total_episodes_string">Total Episodes %s</string>
+    <string name="search_back">back</string>
+    <string name="sort_by_popular">Popularity</string>
+    <string name="sort_by_name">A-Z</string>
+    <string name="sort_by_genre">Genre</string>
+    <string name="no_search_results">No results found so far, search for something.</string>
 
 </resources>

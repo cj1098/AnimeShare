@@ -4,11 +4,13 @@ import com.bumptech.glide.util.Util;
 
 import javax.inject.Singleton;
 
+import cj1098.animedetails.AnimeDetailsFragment;
 import cj1098.animeshare.animelist.AnimeListFragment;
 import cj1098.animeshare.home.HomeHeadlessFragment;
 import cj1098.animeshare.service.AnimeRequestService;
 import cj1098.base.BaseActivity;
 import cj1098.base.BaseApplication;
+import cj1098.search.SearchActivity;
 import dagger.Component;
 
 public class ApplicationComponent {
@@ -30,6 +32,10 @@ public class ApplicationComponent {
 
         void inject(BaseActivity baseActivity);
 
+        void inject(SearchActivity searchActivity);
+
         void inject(AnimeRequestService animeRequestService);
+
+        void inject(AnimeDetailsFragment animeDetailsFragment);
     }
 }
