@@ -1,16 +1,14 @@
 package cj1098.animeshare.modules;
 
-import com.bumptech.glide.util.Util;
-
 import javax.inject.Singleton;
 
 import cj1098.animedetails.AnimeDetailsFragment;
-import cj1098.animeshare.animelist.AnimeListFragment;
+import cj1098.animeshare.home.animelist.AnimeListFragment;
 import cj1098.animeshare.home.HomeHeadlessFragment;
 import cj1098.animeshare.service.AnimeRequestService;
 import cj1098.base.BaseActivity;
 import cj1098.base.BaseApplication;
-import cj1098.search.SearchActivity;
+import cj1098.animeshare.home.search.SearchActivity;
 import dagger.Component;
 
 public class ApplicationComponent {

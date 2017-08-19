@@ -1,4 +1,4 @@
-package cj1098.search;
+package cj1098.animeshare.home.search;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -23,9 +23,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import cj1098.animeshare.R;
-import cj1098.animeshare.ShowsRecyclerAdapter;
 import cj1098.animeshare.userList.SearchAnimeObject;
-import cj1098.animeshare.userList.SmallAnimeObject;
 
 /**
  * Created by chris on 12/31/16.

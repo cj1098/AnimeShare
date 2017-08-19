@@ -1,4 +1,4 @@
-package cj1098.animeshare.CustomViews;
+package cj1098.animeshare.customViews;
 
 
 import android.graphics.Rect;

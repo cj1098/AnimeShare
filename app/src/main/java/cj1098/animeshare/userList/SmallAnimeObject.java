@@ -1,15 +1,11 @@
 package cj1098.animeshare.userList;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.support.annotation.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +37,8 @@ import java.util.Map;
         "image_url_banner",
         "total_episodes",
         "airing_status",
-        "tags"
+        "tags",
+        "hashtag"
 })
 public class SmallAnimeObject extends AnimeObject {
 
@@ -87,10 +84,14 @@ public class SmallAnimeObject extends AnimeObject {
     private Integer totalEpisodes;
     @JsonProperty("airing_status")
     private String airingStatus;
+    @JsonProperty("hashtag")
+    private String hashTag;
+    @JsonProperty("youtube_id")
+    private String youtubeId;
     @JsonProperty("tags")
     private List<Tag> tags = null;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new HashMap<>();
 
 
     public SmallAnimeObject() {

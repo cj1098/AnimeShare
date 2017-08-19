@@ -5,11 +5,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
 
-/**
- * Created by chris on 11/18/16.
- */
-
-
 public class NetworkUtil {
     /**
      * Get the network info

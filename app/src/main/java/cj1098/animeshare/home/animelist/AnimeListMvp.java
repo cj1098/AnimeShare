@@ -1,8 +1,7 @@
-package cj1098.animeshare.animelist;
+package cj1098.animeshare.home.animelist;
 
 import java.util.List;
 
-import cj1098.animeshare.userList.AnimeObject;
 import cj1098.animeshare.userList.SmallAnimeObject;
 import cj1098.base.BaseMvp;
 import cj1098.base.BaseView;
@@ -18,7 +17,7 @@ public interface AnimeListMvp extends BaseMvp {
     }
 
     interface Presenter extends BaseMvp.Presenter<View>{
-        void makeBatchCall(String page);
+        void makeBatchCall(int page);
 
         void makeAuthRequest();
 

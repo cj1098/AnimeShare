@@ -1,44 +1,32 @@
-package cj1098.animeshare.animelist;
+package cj1098.animeshare.home.animelist;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.res.Resources;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.Transformation;
 import android.widget.ProgressBar;
-import android.widget.Toast;
-
-
-import org.simpleframework.xml.Root;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.Bind;
-import cj1098.animeshare.CustomViews.DotLoader;
-import cj1098.animeshare.CustomViews.SpacesItemDecoration;
-import cj1098.animeshare.CustomViews.WrapContentGridLayoutManager;
+import cj1098.animeshare.customViews.SpacesItemDecoration;
+import cj1098.animeshare.customViews.WrapContentGridLayoutManager;
 import cj1098.animeshare.R;
 import cj1098.animeshare.ShowsRecyclerAdapter;
-import cj1098.animeshare.userList.AnimeObject;
 import cj1098.animeshare.userList.SmallAnimeObject;
 import cj1098.animeshare.util.DaggerUtil;
 import cj1098.animeshare.util.NetworkUtil;
-import cj1098.animeshare.util.UiUtil;
 import cj1098.base.BaseFragment;
 import cj1098.event.NoNetworkEvent;
 import cj1098.event.RxBus;
@@ -50,8 +38,10 @@ import cj1098.event.SlowNetworkEvent;
  * Use the {@link AnimeListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AnimeListFragment extends BaseFragment implements AnimeListMvp.View {
+public class AnimeListFragment extends BaseFragment implements AnimeListMvp.View, View.OnClickListener {
     public static final String TAG = AnimeListFragment.class.getName();
+
+    private static final int LOADING_INCREMENT = 40;
 
     @Inject
     AnimeListMvp.Presenter mAnimeListPresenter;
@@ -86,7 +76,6 @@ public class AnimeListFragment extends BaseFragment implements AnimeListMvp.View
     @Bind(R.id.gridview_loader)
     ProgressBar mAnimatedLoader;
 
-    private DotLoader mDotLoader;
     private GridLayoutManager mLayoutManager;
     private ShowsRecyclerAdapter mAdapter;
     private boolean isLoading = false;
@@ -110,25 +99,22 @@ public class AnimeListFragment extends BaseFragment implements AnimeListMvp.View
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         DaggerUtil.getInstance().getApplicationComponent().inject(this);
+        if (NetworkUtil.isConnected(getContext())) {
+            mAnimeListPresenter.makeAuthRequest();
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_shows, container, false);
-
-        if (NetworkUtil.isConnected(getContext())) {
-            mAnimeListPresenter.makeAuthRequest();
-        }
-        return v;
+        return inflater.inflate(R.layout.fragment_shows, container, false);
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        initControls();
-        setupFAB();
+        setupViews();
     }
 
     @Override
@@ -145,17 +131,25 @@ public class AnimeListFragment extends BaseFragment implements AnimeListMvp.View
         mAnimeListPresenter.detachView();
     }
 
-    private void setupFAB() {
-        mSortingFAB.setOnClickListener(view -> {
-            if (!isFABOpen) {
-                showFABMenu();
-            }
-            else {
-                hideFABMenu();
-            }
-            // TODO: create a transparent fragment and then animate however many FAB's above this one. Mimic CrunchyRoll
-
-        });
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.anime_sort_fab:
+                if (!isFABOpen) {
+                    // TODO: create a transparent fragment and then animate however many FAB's above this one. Mimic CrunchyRoll
+                    showFABMenu();
+                }
+                else {
+                    hideFABMenu();
+                }
+                break;
+            case R.id.anime_sort_fab_one:
+            case R.id.anime_sort_fab_two:
+            case R.id.anime_sort_fab_three:
+                break;
+            default:
+                break;
+        }
     }
 
     private void showFABMenu() {
@@ -232,7 +226,7 @@ public class AnimeListFragment extends BaseFragment implements AnimeListMvp.View
     /**
      * setup the recyclerview and tell it to listen for scroll changes and act accordingly.
      */
-    private void initControls() {
+    private void setupViews() {
         mLayoutManager = new WrapContentGridLayoutManager(getActivity(), 3);
         mRecyclerView.addItemDecoration(new SpacesItemDecoration(10));
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -245,6 +239,11 @@ public class AnimeListFragment extends BaseFragment implements AnimeListMvp.View
                 isScrollCompleted();
             }
         });
+
+        mSortingFAB.setOnClickListener(this);
+        mGenreFAB.setOnClickListener(this);
+        mSeasonsFAB.setOnClickListener(this);
+        mPopularFAB.setOnClickListener(this);
     }
 
     /**
@@ -255,13 +254,12 @@ public class AnimeListFragment extends BaseFragment implements AnimeListMvp.View
     private void isScrollCompleted() {
         if ((mLayoutManager.findFirstVisibleItemPosition() + mLayoutManager.getChildCount()) >= mLayoutManager.getItemCount() - 3) {
             if (!isLoading) {
-
                 isLoading = true;
-                //TODO: add a connected slow check and then post a slowNetwork event that would display either no network speed
-                //TODO: or a too slow to operate speed.
+                // TODO: add a connected slow check and then post a slowNetwork event that would display either no network speed
+                // TODO: or a too slow to operate speed.
+                // TODO: Also, move the network checks to the presenter layer and use rx to emit values for if we're connected or not before making any call.
                 if (NetworkUtil.isConnected(getContext())) {
-                    // TODO: presenter should make the call here and everywhere in this class.
-                    mAnimeListPresenter.makeBatchCall(Integer.toString(mLayoutManager.getItemCount() / 40) + 1);
+                    mAnimeListPresenter.makeBatchCall(mLayoutManager.getItemCount() / LOADING_INCREMENT);
                     //mRequestService.getAnimeBatch("1ndqqBfOCq9FpXTKsPB5NE4JR8Fp5iQy6kctMfnK", Integer.toString(mLayoutManager.getItemCount() / 40) + 1);
                 }
                 else if (!NetworkUtil.isConnectedFast(getContext())){
@@ -282,12 +280,12 @@ public class AnimeListFragment extends BaseFragment implements AnimeListMvp.View
 
     @Override
     public void updateAnimeList(List<SmallAnimeObject> animeList) {
-        if (mLayoutManager.getItemCount() == 0) {
-            mAdapter = new ShowsRecyclerAdapter(getActivity(), animeList);
-            mRecyclerView.setAdapter(mAdapter);
+        if (mLayoutManager.getItemCount() > 0) {
+            mAdapter.addBatchResponseToList(animeList);
         }
         else {
-            mAdapter.addBatchResponseToList(animeList);
+            mAdapter = new ShowsRecyclerAdapter(getActivity(), animeList);
+            mRecyclerView.setAdapter(mAdapter);
         }
     }
 

@@ -79,11 +79,6 @@ public class RadioStreamFragment extends BaseFragment {
     @Override
     public void onAttach(Context activity) {
         super.onAttach(activity);
-        try {
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
     }
 
     @Override

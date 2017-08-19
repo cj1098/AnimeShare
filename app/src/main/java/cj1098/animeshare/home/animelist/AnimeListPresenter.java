@@ -1,14 +1,16 @@
-package cj1098.animeshare.animelist;
+package cj1098.animeshare.home.animelist;
+
+import android.support.annotation.NonNull;
 
 import java.util.concurrent.TimeUnit;
 
+import cj1098.animeshare.exceptions.ViewAlreadyAttachedException;
 import cj1098.animeshare.service.AnimeRequestService;
 import cj1098.animeshare.util.DatabaseUtil;
 import cj1098.animeshare.util.Preferences;
 import cj1098.base.BasePresenter;
 import cj1098.event.AccessTokenRetrievedEvent;
 import cj1098.event.BatchResponseFinishedEvent;
-import cj1098.event.InitialDatabaseStorageEventEnded;
 import cj1098.event.RxBus;
 import rx.subscriptions.CompositeSubscription;
 
@@ -17,6 +19,8 @@ import rx.subscriptions.CompositeSubscription;
  */
 
 public class AnimeListPresenter extends BasePresenter<AnimeListMvp.View> implements AnimeListMvp.Presenter{
+
+    private static final int STARTING_PAGE = 1;
 
     private CompositeSubscription mCompositeSubscription;
     private RxBus mRxBus;
@@ -29,6 +33,11 @@ public class AnimeListPresenter extends BasePresenter<AnimeListMvp.View> impleme
         mDatabaseUtil = databaseUtil;
         mPreferences = preferences;
         mService = service;
+    }
+
+    @Override
+    public void attachView(@NonNull AnimeListMvp.View view) throws ViewAlreadyAttachedException {
+        super.attachView(view);
     }
 
     @Override
@@ -50,7 +59,7 @@ public class AnimeListPresenter extends BasePresenter<AnimeListMvp.View> impleme
 
     // region AnimeListMvp presenter interface methods
     @Override
-    public void makeBatchCall(String page) {
+    public void makeBatchCall(int page) {
         if (isAttached() && System.currentTimeMillis() < mPreferences.getmAccessTokenExpireTime()) {
             mService.getAnimeBatch(mPreferences.getAccessToken(), page);
             mPreferences.setmAccessTokenExpireTime(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(1));
@@ -62,7 +71,7 @@ public class AnimeListPresenter extends BasePresenter<AnimeListMvp.View> impleme
 
     @Override
     public void makeAuthRequest() {
-        mService.getAccessTokenAndMakeBatchRequest("1");
+        mService.getAccessTokenAndMakeBatchRequest(STARTING_PAGE);
     }
 
     // endregion

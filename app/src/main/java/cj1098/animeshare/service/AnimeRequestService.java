@@ -86,7 +86,7 @@ public class AnimeRequestService {
         Call<List<SearchAnimeObject>> searchAnimeByTitle(@Path("name") String name, @Query("access_token") String token);
     }
 
-    public void getAccessTokenAndMakeBatchRequest(String page) {
+    public void getAccessTokenAndMakeBatchRequest(int page) {
         Map<String, String> queryMap = new HashMap<>();
         queryMap.put("grant_type", GRANT_TYPE);
         queryMap.put("client_id", CLIENT_ID);
@@ -108,10 +108,10 @@ public class AnimeRequestService {
     }
 
     // NOTE: divide by 40 to get the correct page **** 0 and 1 are the same page. ****
-    public void getAnimeBatch(String access_token, String page) {
+    public void getAnimeBatch(String access_token, int page) {
         Map<String, String> queryMap = new HashMap<>();
         queryMap.put("access_token", access_token);
-        queryMap.put("page", page);
+        queryMap.put("page", Integer.toString(page));
         Call<List<SmallAnimeObject>> call = mAniListService.getBatchResponse(queryMap);
         call.enqueue(new Callback<List<SmallAnimeObject>>() {
             @Override

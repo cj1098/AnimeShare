@@ -1,9 +1,6 @@
-package cj1098.search;
-
-import android.support.annotation.NonNull;
+package cj1098.animeshare.home.search;
 
 
-import cj1098.animeshare.exceptions.ViewAlreadyAttachedException;
 import cj1098.animeshare.service.AnimeRequestService;
 import cj1098.animeshare.util.Preferences;
 import cj1098.base.BasePresenter;

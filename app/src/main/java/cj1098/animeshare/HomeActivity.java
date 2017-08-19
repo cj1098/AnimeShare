@@ -1,14 +1,9 @@
 package cj1098.animeshare;
 
-import android.app.Activity;
-import android.app.ActivityOptions;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -18,66 +13,34 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
 import android.transition.Transition;
-import android.util.Log;
-import android.util.Pair;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
-import cj1098.search.SearchActivity;
-import cj1098.animeshare.animelist.AnimeListFragment;
+import cj1098.animeshare.home.search.SearchActivity;
+import cj1098.animeshare.home.animelist.AnimeListFragment;
 import cj1098.animeshare.home.HomeHeadlessFragment;
-import cj1098.animeshare.service.UserInformationService;
-import cj1098.animeshare.viewmodels.UserViewModel;
 import cj1098.base.BaseActivity;
-import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.jackson.JacksonConverterFactory;
 
 
 public class HomeActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
-    public static HashMap<String, Drawable> sCachedImages;
+    public static final String TAG = HomeActivity.class.getSimpleName();
+
     private Toolbar mToolbar;
-    private RecyclerView.LayoutManager mLayoutManager;
-    private DrawerRecyclerAdapter mAdapter;
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavView;
     private ActionBarDrawerToggle mDrawerToggle;
 
-    private HomeHeadlessFragment homeHeadlessFragment;
-    private AnimeListFragment animeListFragment;
+    private HomeHeadlessFragment mHomeHeadlessFragment;
+    private AnimeListFragment mAnimeListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,8 +55,8 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
         }
         // otherwise, re-initialize everything here.
         else {
-            homeHeadlessFragment = (HomeHeadlessFragment)getSupportFragmentManager().findFragmentByTag(HomeHeadlessFragment.TAG);
-            animeListFragment =  (AnimeListFragment)getSupportFragmentManager().findFragmentByTag(AnimeListFragment.TAG);
+            mHomeHeadlessFragment = (HomeHeadlessFragment)getSupportFragmentManager().findFragmentByTag(HomeHeadlessFragment.TAG);
+            mAnimeListFragment =  (AnimeListFragment)getSupportFragmentManager().findFragmentByTag(AnimeListFragment.TAG);
         }
 
         setupWindowAnimations();
@@ -109,7 +72,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     protected void onResume() {
         super.onResume();
-
     }
 
     @Override
@@ -145,56 +107,8 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
+        return mDrawerToggle.onOptionsItemSelected(item) || id == R.id.action_settings || super.onOptionsItemSelected(item);
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            JacksonConverterFactory jacksonConverterFactory = JacksonConverterFactory.create(objectMapper);
-
-            OkHttpClient.Builder client = new OkHttpClient.Builder();
-            HttpLoggingInterceptor logging = new HttpLoggingInterceptor(message -> Log.d(TAG, message));
-            logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
-            client.addInterceptor(logging);
-
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl("http://50.132.216.152")
-                    .client(client.build())
-                    .addConverterFactory(jacksonConverterFactory)
-                    .build();
-
-            UserInformationService userService = retrofit.create(UserInformationService.class);
-            JSONObject jsonObject = new JSONObject();
-            try {
-                jsonObject.put("username", "test2");
-                jsonObject.put("device_manufacturer", "duhh");
-                jsonObject.put("android_version", "6.5.2");
-                jsonObject.put("phone_model", "nexus6");
-                jsonObject.put("locale", "US");
-                jsonObject.put("password", "password1");
-            }
-            catch (JSONException je) {
-
-            }
-            UserViewModel viewmodel = new UserViewModel("test2", "what the actual fuck", "6.5.2", "nexus6", "US", "password6");
-            Call<UserViewModel> call = userService.sendUserInfo(viewmodel);
-            call.enqueue(new Callback<UserViewModel>() {
-                @Override
-                public void onResponse(Call<UserViewModel> call, Response<UserViewModel> response) {
-                    Toast.makeText(HomeActivity.this, response.body().toString(), Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void onFailure(Call<UserViewModel> call, Throwable t) {
-                    Log.d(TAG, t.toString());
-                }
-            });
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     // This is tied to menu/menu_main.xml's search
@@ -263,30 +177,32 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        // TODO: replace with switch
-        if (menuItem.getItemId() == R.id.navigation_item_1) {
-            Snackbar.make(mToolbar, "1", Snackbar.LENGTH_SHORT).show();
-            if (getSupportFragmentManager().findFragmentById(R.id.base_content) != null) {
-                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.base_content, AnimeListFragment.newInstance());
-                ft.commit();
-            }
-        } else if (menuItem.getItemId() == R.id.navigation_item_2) {
-            Snackbar.make(mToolbar, "2", Snackbar.LENGTH_SHORT).show();
-            if (getSupportFragmentManager().findFragmentById(R.id.base_content) != null) {
-                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.base_content, RadioStreamFragment.newInstance());
-                ft.commit();
-            }
-        } else if (menuItem.getItemId() == R.id.navigation_item_3) {
-
-        } else if (menuItem.getItemId() == R.id.navigation_item_4) {
-
-        } else if (menuItem.getItemId() == R.id.navigation_item_5) {
-
-        } else {
-
+        switch (menuItem.getItemId()) {
+            case R.id.navigation_item_1:
+                Snackbar.make(mToolbar, "1", Snackbar.LENGTH_SHORT).show();
+                if (getSupportFragmentManager().findFragmentById(R.id.base_content) != null) {
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.base_content, AnimeListFragment.newInstance());
+                    ft.commit();
+                }
+                break;
+            case R.id.navigation_item_2:
+                Snackbar.make(mToolbar, "2", Snackbar.LENGTH_SHORT).show();
+                if (getSupportFragmentManager().findFragmentById(R.id.base_content) != null) {
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.base_content, RadioStreamFragment.newInstance());
+                    ft.commit();
+                }
+                break;
+            case R.id.navigation_item_3:
+            case R.id.navigation_item_4:
+            case R.id.navigation_item_5:
+            case R.id.navigation_item_6:
+                break;
+            default:
+                break;
         }
+
         menuItem.setChecked(true);
         mDrawerLayout.closeDrawers();
 
@@ -303,54 +219,5 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.add(R.id.base_content, AnimeListFragment.newInstance(), AnimeListFragment.TAG);
         ft.commit();
-    }
-
-    public class MyAsync extends AsyncTask<String, Void, Boolean> {
-        @Override
-        protected Boolean doInBackground(String... strings) {
-
-            try {
-                URL url = new URL("http://50.132.216.152/sendInformation.php");
-                HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-                conn.setRequestMethod("POST");
-                conn.setDoInput(true);
-                conn.setDoOutput(true);
-                OutputStream os = conn.getOutputStream();
-                os.flush();
-                os.close();
-                InputStream in = conn.getInputStream();
-                InputStreamReader isw = new InputStreamReader(in);
-                int data = isw.read();
-                String test = "";
-                while (data != -1) {
-                    char current = (char) data;
-                    data = isw.read();
-                    test += current;
-                }
-                String blah = test;
-                HomeActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(HomeActivity.this, blah, Toast.LENGTH_SHORT).show();
-                    }
-                });
-                BufferedWriter writer = new BufferedWriter(
-                        new OutputStreamWriter(os, "UTF-8"));
-                conn.connect();
-            }
-            catch (MalformedURLException u) {
-
-            }
-            catch (IOException io ) {
-
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
-            Toast.makeText(HomeActivity.this, "asdas", Toast.LENGTH_LONG).show();
-        }
     }
 }

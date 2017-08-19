@@ -2,16 +2,16 @@ package cj1098.animeshare.modules;
 
 import cj1098.animedetails.AnimeDetailsMvp;
 import cj1098.animedetails.AnimeDetailsPresenter;
-import cj1098.animeshare.animelist.AnimeListMvp;
-import cj1098.animeshare.animelist.AnimeListPresenter;
+import cj1098.animeshare.home.animelist.AnimeListMvp;
+import cj1098.animeshare.home.animelist.AnimeListPresenter;
 import cj1098.animeshare.home.HomeHeadlessMvp;
 import cj1098.animeshare.home.HomeHeadlessPresenter;
 import cj1098.animeshare.service.AnimeRequestService;
 import cj1098.animeshare.util.DatabaseUtil;
 import cj1098.animeshare.util.DeviceUtil;
 import cj1098.animeshare.util.Preferences;
-import cj1098.search.SearchMvp;
-import cj1098.search.SearchPresenter;
+import cj1098.animeshare.home.search.SearchMvp;
+import cj1098.animeshare.home.search.SearchPresenter;
 import dagger.Module;
 import dagger.Provides;
 

@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="cj1098.search.SearchActivity"
+        <activity android:name=".home.search.SearchActivity"
             android:windowSoftInputMode="adjustNothing"
             android:label="@string/search_label">
         </activity>

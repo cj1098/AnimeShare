@@ -1,10 +1,8 @@
-package cj1098.search;
+package cj1098.animeshare.home.search;
 
 import java.util.List;
 
-import cj1098.animeshare.userList.AnimeObject;
 import cj1098.animeshare.userList.SearchAnimeObject;
-import cj1098.animeshare.userList.SmallAnimeObject;
 import cj1098.base.BaseMvp;
 import cj1098.base.BaseView;
 

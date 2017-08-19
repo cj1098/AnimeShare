@@ -119,7 +119,7 @@ public class UiUtil {
 
     }
 
-    // TODO: can we use the one in DeviceUtil instead?
+    // TODO: this is useful for testing when you can't mock deviceUtil. Use this instead
     public static float dpFromPx(float px, @NonNull Context context) {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         return px / ((float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
