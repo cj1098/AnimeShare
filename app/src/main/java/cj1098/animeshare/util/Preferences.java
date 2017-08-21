@@ -7,8 +7,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
-import android.util.Base64;
 import android.util.Log;
 
 import java.util.concurrent.TimeUnit;
@@ -100,25 +98,6 @@ public class Preferences implements SharedPreferences.OnSharedPreferenceChangeLi
         return mMobileCarrier;
     }
 
-    @NonNull
-    public String getUserName() {
-        String decryptedUsername = "";
-
-        /*if (mEncryptedUsername != null) {
-            try {
-                LogUtil.d(TAG, withTags(UTL), "On Decryption, Encrypted Username: " + mEncryptedUsername);
-                decryptedUsername = new String(CryptoUtil.decrypt(Base64.decode(mEncryptedUsername, Base64.DEFAULT),
-                        CryptoUtil.createEncryptionKey()));
-                LogUtil.d(TAG, withTags(UTL), "On Decryption, Decrypted Username: " + decryptedUsername);
-            } catch (Exception e) {
-                LogUtil.e(TAG, withTags(UTL), "Exception in generateUuid", e);
-            }
-        }*/
-
-        return decryptedUsername;
-    }
-
-
     public void setFirstTimeLogin(boolean firstTimeLogin) {
         Editor editor = getSharedPreferences().edit();
         editor.putBoolean(FIRST_TIME_LOGIN, firstTimeLogin);
@@ -143,23 +122,6 @@ public class Preferences implements SharedPreferences.OnSharedPreferenceChangeLi
 
     public String getAccessToken() {
         return mAccessToken;
-    }
-
-    public void setUsername(@NonNull String username) {
-        /*try {
-            Editor editor = getSharedPreferences().edit();
-            LogUtil.d(TAG, withTags(UTL), "On Encryption, Username: " + username);
-
-            username = Base64.encodeToString(CryptoUtil.encrypt(username.getBytes(), CryptoUtil.createEncryptionKey()), Base64.DEFAULT);
-
-            LogUtil.d(TAG, withTags(UTL), "On Encryption, Encrypted Username: " + username);
-
-            editor.putString(SXIR_USERNAME, username);
-
-            editor.apply();
-        } catch (Exception e) {
-            LogUtil.e(TAG, withTags(UTL), "Exception in generateUuid", e);
-        }*/
     }
 
     @NonNull
@@ -215,6 +177,4 @@ public class Preferences implements SharedPreferences.OnSharedPreferenceChangeLi
         }
         return false;
     }
-
-    // End generic get/set methods region: used for tests
 }
