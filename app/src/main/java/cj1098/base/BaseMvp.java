@@ -11,18 +11,6 @@ import cj1098.animeshare.exceptions.ViewNotAttachedException;
 
 public interface BaseMvp {
 
-
-    /**
-     * All *Mvp.Presenter interfaces should extend this interface. See
-     * {@link com.sirius.ui.splash.login.LoginMvp.Presenter LoginMvp.Presenter} for an example.
-     *
-     * Furthermore, {@link BasePresenter} implements this interface, and all presenters should extend
-     * that abstract class, which provides important basic functionality. See
-     * {@link com.sirius.ui.splash.login.LoginPresenter LoginPresenter} for an example.
-     *
-     * @param <T> The {@code View} we're parameterizing our subclass on. See
-     *            {@link com.sirius.ui.splash.login.LoginMvp.View LoginMvp.View} for an example.
-     */
     interface Presenter<T extends BaseView> {
 
         /**

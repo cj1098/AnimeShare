@@ -74,7 +74,7 @@ public class AnimeListPresenter extends BasePresenter<AnimeListMvp.View> impleme
         mService.getAccessTokenAndMakeBatchRequest(STARTING_PAGE);
     }
 
-    // endregion
+    // endregion<>
 
     private void storeAccessToken(AccessTokenRetrievedEvent accessTokenReceivedEvent) {
         mPreferences.setAccessToken(accessTokenReceivedEvent.getAccessToken());
